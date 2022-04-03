@@ -1,0 +1,2 @@
+ILE *memin;
+        m
