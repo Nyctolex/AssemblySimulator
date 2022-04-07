@@ -1,2 +1,1 @@
-ILE *memin;
-        m
+%d, 
