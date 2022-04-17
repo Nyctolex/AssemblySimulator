@@ -1,21 +1,20 @@
 #ifndef LABEL_H
 #define LABEL_H
 
-
 // char arr2[NUM_STRINGS][MAX_LENGTH] = { {"first string"},
 //                                           {"second string"},
 //                                           {"third string"},
 //                                           {"fourth string"},
 //                                           {"fifth string"} };
 /**
- * @brief Label is a data struct of a linked list. It has the atrribute of a string name, 
- * the location in the memory of which the Label is point to, and a pointer to the next node. 
+ * @brief Label is a data struct of a linked list. It has the atrribute of a string name,
+ * the location in the memory of which the Label is point to, and a pointer to the next node.
  */
 typedef struct Label
 {
-    char name[50];      // Label's name
-    //location;**
-    int location; // the location of the matching line
+    char name[50]; // Label's name
+    // location;**
+    int location;       // the location of the matching line
     struct Label *next; // a pointer to the next Label
 } Label;
 
@@ -28,12 +27,11 @@ typedef struct Label
  */
 Label *labelGetByName(Label *head, char name[]);
 
-
 /**
  * @brief Get the node in the corresponding index
- * 
+ *
  * @param head - the first node in the likned list.
- * @param index 
+ * @param index
  * @return Label* (in the matching index)
  */
 Label *labelGetByIndex(Label *head, int index);
@@ -41,11 +39,10 @@ Label *labelGetByIndex(Label *head, int index);
 /**
  * @brief Creating a new node with the given parameters and appending it to the end of the linked list.
  * @param head - the first node in the likned list.
- * @param name - the name of the new Label. 
+ * @param name - the name of the new Label.
  * @param location - the memory location of which the Label is pointing to.
  */
 void labelAppendData(Label *head, char name[], int location);
-
 
 /**
  * @brief Append the given node to the end of the linked list.
@@ -53,7 +50,6 @@ void labelAppendData(Label *head, char name[], int location);
  * @param node - the node to be appended.
  */
 void labelAppendNode(Label *head, Label *node);
-
 
 /**
  * @brief Creating a new Label node, and assigning it the given parameters.
@@ -74,14 +70,21 @@ Label *labelLast(Label *head);
  * @brief Return True(1) if the list contains a node with the corresponding name, else returns false(0).
  * @param head - the first node in the likned list.
  * @param name - the name to be searched for.
- * @return int 
+ * @return int
  */
 int labelListContains(Label *head, char name[]);
 
 /**
- * @brief Free a allocted memory of every node in the list. 
+ * @brief Free a allocted memory of every node in the list.
  * @param head - the first node in the likned list.
  */
 void labelDeleteList(Label *head);
+
+/**
+ * @brief Printing all elements in list
+ *
+ * @param head - the first node in the likned list.
+ */
+void labelPrintList(Label *head);
 
 #endif
