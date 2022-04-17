@@ -2,21 +2,22 @@
 #include <stdlib.h>
 #include <string.h>
 #include "Label.h"
-
-label *labelNewLabel(char name[])
+#include "RegisterConst.h"
+Label *labelNewLabel(char name[], int location)
 {
-    label *new_label = (label *)malloc(sizeof(label));
-    if (new_label != NULL)
+    Label *new_label = (Label *)malloc(sizeof(Label));
+    if (new_label != NULL) //making sure the memory allocation succeed
     {
         strcpy(new_label->name, name);
         new_label->next = NULL;
+        new_label->location = location;
     }
     return new_label;
 }
 
-label *labelLast(label *head)
+Label *labelLast(Label *head)
 {
-    label *temp = head;
+    Label *temp = head;
     while (temp->next != NULL)
     {
         temp = temp->next;
@@ -24,29 +25,29 @@ label *labelLast(label *head)
     return temp;
 }
 
-void labelAppendNode(label *head, label *node)
+void labelAppendNode(Label *head, Label *node)
 {
-    label *tail = labelLast(head);
+    Label *tail = labelLast(head); //get the last node
     tail->next = node;
 }
 
-void labelAppendData(label *head, char name[])
+void labelAppendData(Label *head, char name[], int location)
 {
-    label *new_tail = labelNewLabel(name);
-    labelAppendNode(head, new_tail);
+    Label *new_tail = labelNewLabel(name, location); //creatin a new node
+    labelAppendNode(head, new_tail); // appending it to the end of the list
 }
 
-label *labelGetByIndex(label *head, int index)
+Label *labelGetByIndex(Label *head, int index)
 {
-    if (index < 0)
+    if (index < 0) //making sure the index is valid
     {
         return NULL;
     }
-    label *temp = head;
+    Label *temp = head;
     int i;
     for (i = 0; i < index; i++)
     {
-        if (temp != NULL)
+        if (temp != NULL) //if we are not out of range
         {
             temp = temp->next;
         }
@@ -58,22 +59,22 @@ label *labelGetByIndex(label *head, int index)
     return temp;
 }
 
-label *labelGetByName(label *head, char name[])
+Label *labelGetByName(Label *head, char name[])
 {
-    label *temp = head;
+    Label *temp = head;
     int i;
     while (strcmp(temp->name, name))
     {
 
         temp = temp->next;
-        if (temp == NULL)
+        if (temp == NULL) //while we are no out of range
         {
             break;
         }
     }
     return temp;
 }
-int labelListContains(label *head, char name[])
+int labelListContains(Label *head, char name[])
 {
     while (head != NULL)
     {
@@ -86,25 +87,13 @@ int labelListContains(label *head, char name[])
     return FALSE;
 }
 
-void labelDeleteList(label *head)
+void labelDeleteList(Label *head)
 {
-    label *temp;         // A pointer to a label we are going to destroy after updating head
+    Label *temp;         // A pointer to a Label we are going to destroy after updating head
     while (head != NULL) // Destroy all of the list
     {
         temp = head; // temp <-- current node, head <-- head->next
         head = head->next;
         free(temp); // we destroy temp and free the memory
     }
-}
-int main()
-{
-    label *head = labelNewLabel("Alex");
-    labelAppendData(head, "sivan");
-    labelAppendData(head, "oz");
-    labelAppendData(head, "noam");
-    // label *temp = labelGetByName(head, "Alex");
-    printf("%d", labelListContains(head, "noam"));
-    printf("%s", head->name);
-    labelDeleteList(head);
-    return 0;
 }

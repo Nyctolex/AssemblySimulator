@@ -1,31 +1,32 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "Line.h"
+#include "RegisterConst.h"
 
-line *lineNewLine(char opcode[], char rd[], char rs[], char rt[], char imm_reg[], char imm[], int location)
+Line *lineNewLine(char opcode[], char rd[], char rs[], char rt[], char imm[], int location)
 {
-    line *new_line = (line *)malloc(sizeof(line));
+    Line *new_line = (Line *)malloc(sizeof(Line));
     if (new_line != NULL)
     {
         strcpy(new_line->rt, rt);
         strcpy(new_line->rs, rs);
         strcpy(new_line->rd, rd);
         strcpy(new_line->opcode, opcode);
-        strcpy(new_line->imm_reg, imm_reg);
         strcpy(new_line->imm, imm);
         new_line->location = location;
         new_line->next = NULL;
     }
     return new_line;
 }
-line *lineGetByIndex(line *head, int index)
+Line *lineGetByIndex(Line *head, int index)
 {
     if (index < 0)
     {
         return NULL;
     }
-    line *temp = head;
+    Line *temp = head;
     int i;
     for (i = 0; i < index; i++)
     {
@@ -41,9 +42,9 @@ line *lineGetByIndex(line *head, int index)
     return temp;
 }
 
-line *lineGetByLocation(line *head, int location)
+Line *lineGetByLocation(Line *head, int location)
 {
-    line *temp = head;
+    Line *temp = head;
     int i;
     while (temp->location != location)
     {
@@ -56,9 +57,9 @@ line *lineGetByLocation(line *head, int location)
     }
     return temp;
 }
-line *lineLast(line *head)
+Line *lineLast(Line *head)
 {
-    line *temp = head;
+    Line *temp = head;
     while (temp->next != NULL)
     {
         temp = temp->next;
@@ -66,20 +67,20 @@ line *lineLast(line *head)
     return temp;
 }
 
-void lineAppendNode(line *head, line *node)
+void lineAppendNode(Line *head, Line *node)
 {
-    line *tail = lineLast(head);
+    Line *tail = lineLast(head);
     tail->next = node;
 }
 
-line *lineAppendData(line *head, char opcode[], char rd[], char rs[], char rt[], char imm_reg[], char imm[], int location)
+Line *lineAppendData(Line *head, char opcode[], char rd[], char rs[], char rt[], char imm[], int location)
 {
-    line *new_tail = lineNewLine(opcode, rd, rs, rt, imm_reg, imm, location);
+    Line *new_tail = lineNewLine(opcode, rd, rs, rt,  imm, location);
     lineAppendNode(head, new_tail);
 }
-void lineDeleteList(line *head)
+void lineDeleteList(Line *head)
 {
-    line *temp;          // A pointer to a label we are going to destroy after updating head
+    Line *temp;          // A pointer to a line we are going to destroy after updating head
     while (head != NULL) // Destroy all of the list
     {
         temp = head; // temp <-- current node, head <-- head->next
@@ -88,13 +89,27 @@ void lineDeleteList(line *head)
     }
 }
 
-int main()
+int lineIsImmidiate(Line *line){
+  // if one of the registers is the imm register.
+  if ((strcmp(IMM_REG, line->rs) == 0) || (strcmp(IMM_REG, line->rd) == 0) || (strcmp(IMM_REG, line->rt) == 0)){
+    return TRUE;
+  }
+  return FALSE;
+}
+
+void lineCalculateLocation(Line *head)
 {
-    line *head = lineNewLine("op0", "rd", "rs", "ty", "immtr", "imm_reg", 0);
-    lineAppendData(head, "op1", "rd", "rs", "ty", "immtr", "imm_reg", 5);
-    lineAppendData(head, "op2", "rd", "rs", "ty", "immtr", "imm_reg", 0);
-    line *temp = lineGetByLocation(head, 5);
-    printf("%s", temp->opcode);
-    lineDeleteList(head);
-    return 0;
+  int counter = 0;
+    Line *temp = head; //line pointer to the current line struct.  
+    while (temp != NULL) // Destroy all of the list
+    {
+        temp->location = counter;
+        if (lineIsImmidiate(temp)){
+          counter += 2;
+        }
+        else{
+          counter++;
+        }
+        temp = temp->next;
+    }
 }
