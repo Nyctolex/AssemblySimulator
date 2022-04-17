@@ -1,0 +1,1 @@
+isdigit(var[0])
