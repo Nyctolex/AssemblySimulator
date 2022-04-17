@@ -1,1 +1,1 @@
-%d, 
+isdigit(var[0])

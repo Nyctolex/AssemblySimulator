@@ -1,5 +1,6 @@
 # include <stdio.h>
 # include <string.h>
+# include <ctype.h>
 # include "Label.h"
 # include "dict.c"
 
@@ -21,6 +22,8 @@ int add_label(char *line, int line_loc)
     {
         char label [MAX_LINE_SIZE] = "";
         for (int i = 0; line[i] != ':'; i++) label[i] = line[i];
+        printf("%s %d\n", label, line_loc);
+        // labelAppendData()
         // ! append label
     }
 int search_label(char *line, int line_index, int line_loc) // iterate a line and check if there is a label in it
@@ -35,36 +38,43 @@ int search_label(char *line, int line_index, int line_loc) // iterate a line and
                     }
             }
         if (is_imm(line)) line_loc++;
-        // printf("%d, %d, %d: %s", line_index, line_loc, line_loc-line_index, line);
         return line_loc;
     }
 int translate_file(char *line, int line_index, int line_loc)
     {
-        char *var = "";
+        char var[MAX_LINE_SIZE] = "";
         int counter = 0;
+        int len = 0;
         int hex;
-        for (int i = 0; i < MAX_LINE_SIZE; i++) // check if line is only label
-            {
-                if (line[i] == '\0') break;
-                if (line[i] == ':')
-                    {
-                        // printf("%s", line);
-                        // ! search the label's val and output it
-                    }
-            }
         for (int i = 0; i < MAX_LINE_SIZE; i++)
             {
-                if (line[i] == '\0' || line[i] == '#') break;
-                else if (line[i] == ' ') continue;
-                else if (line[i] == ',')
+                if (isspace(line[i])) continue;
+                else if (counter == 4 && isalpha(line[i]) || line[i] == ':')
                     {
-                        hex = compare(var);
+                        // printf("label");
+                        break;
+                        // ! take care of label
+                    }
+                else if (line[i] == ',' || line[i] == '$' || line[i] == '#')
+                    {
+                        if (strlen(var) != 0 && !isdigit(var[0]))
+                            {
+                                hex = compare(var);
+                                // printf("%x", hex);
+                                var[0] = '\0';
+                                len = 0;
+                                counter++;
+                            }
+                        // else if (isdigit(var[0])) printf("\n%s", var);
+                        if (line[i] == '#') break;
                     }
                 else
                     {
-                        strcat(var, line[i]); // FIXME
+                        var[len] = line[i];
+                        var[++len] = '\0';
                     }
             }
+        // printf("\n");
     }
 int iter_lines(FILE *fp, char iter_type)
     {
