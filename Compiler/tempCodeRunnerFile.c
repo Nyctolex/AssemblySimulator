@@ -1,1 +1,1 @@
-isdigit(var[0])
+atoi(var) == 0
