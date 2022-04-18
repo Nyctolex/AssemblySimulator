@@ -10,3 +10,14 @@ Compiler/testing.exe
 Compiler/Line.exe
 Compiler/Line.exe
 Fibonacci/
+Simulator/.vscode/launch.json
+Simulator/.vscode/settings.json
+Simulator/.vscode/tasks.json
+Simulator/cycles.txt
+*.txt
+Simulator/fib.asm
+Simulator/Line.c
+Simulator/Line.h
+Simulator/monitor.yuv
+Simulator/simulator.exe
+Simulator/testing.c
