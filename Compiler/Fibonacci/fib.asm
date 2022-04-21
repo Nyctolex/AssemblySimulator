@@ -44,8 +44,8 @@ L3:
 	add $t1, $zero, $imm, 1				# $t1 = 1
 	out $t1, $zero, $imm, 22			# draw pixel
 	in $t1, $zero, $imm, 20				# read pixel address
-	add $t0, $t0, $imm, 257				# $t0 += 257
-	out $t0, $zero, $imm, 20			# update address
+	add $t1, $t1, $imm, 257				# $t1 += 257
+	out $t1, $zero, $imm, 20			# update address
 	out $zero, $zero, $imm, 5			# clear irq2 status
 	reti $zero, $zero, $zero, 0			# return from interrupt
 	.word 256 7
