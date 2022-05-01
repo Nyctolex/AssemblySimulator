@@ -104,7 +104,6 @@ int decode_inst(int pc, int *reg, int *ioreg, Instruction *inst, int *cycle)
 
     int pc_adder = 1; // adding 1 or 2 according to the type of the instruction.
     int cycles_adder = 1;
->>>>>>> Stashed changes
     if (instructionType(inst) == I_TYPE)
     {
         cycles_adder = 2;
