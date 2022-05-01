@@ -77,7 +77,7 @@ void run_instructions(Instruction *instructions, int *reg, int *ioreg)
 
 int decode_inst(int pc, int *reg, int *ioreg, Instruction *inst)
 {
-    int pc_adder = 1; // adding 1 or 2 according to the type of the instruction.
+    int pc_adder = 1; // adding 1 or 2 according to the type of the instruction..
     if (instructionType(inst) == I_TYPE)
     {
         reg[IMM_REG] = inst->imm;
