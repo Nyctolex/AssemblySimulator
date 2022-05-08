@@ -38,7 +38,7 @@ int search_label(char *line, int line_index, int line_loc, Label *label_list) //
         if (is_imm(line)) line_loc++;
         return line_loc;
     }
-void translate_file(char *line, int line_index, int line_loc, Label *label_list)
+void translate_file(char *line, int line_index, int line_loc, Label *label_list, FILE *memin)
     {
         char var[MAX_LINE_SIZE] = "";
         int counter = 0;
@@ -57,18 +57,18 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list)
                                 var[++len] = '\0';
                             }
                         label = labelGetByName(label_list, var);
-                        printf("\n%05X", label -> location);
+                        fprintf (memin, "\n%05X", label -> location);
                         break;
                     }
                 else if (line[i] == ',' || line[i] == '$' || line[i] == '#')
                     {
-                        if ((isdigit(var[0]) || (var[0] == '-')) && atoi(var) != 0) printf("\n%05X", atoi(var)&0x000FFFFF);
-                        else if (is_imm(line) && atoi(var) == 0 && counter == 4) printf("\n%05X", atoi(var));
+                        if ((isdigit(var[0]) || (var[0] == '-')) && atoi(var) != 0) fprintf(memin, "\n%05X", atoi(var)&0x000FFFFF);
+                        else if (is_imm(line) && atoi(var) == 0 && counter == 4) memin, fprintf(memin, "\n%05X", atoi(var));
                         else if (strlen(var) != 0 && !isdigit(var[0]))
                             {
                                 hex = compare(var);
-                                if (counter == 0) printf("%02X", hex);
-                                else printf("%01X", hex);
+                                if (counter == 0) fprintf(memin, "%02X", hex);
+                                else fprintf(memin, "%01X", hex);
                                 var[0] = '\0';
                                 len = 0;
                                 counter++;
@@ -81,9 +81,9 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list)
                         var[++len] = '\0';
                     }
             }
-        printf("\n");
+        fprintf(memin, "\n");
     }
-int iter_lines(FILE *fp, char iter_type, Label *label_list)
+int iter_lines(FILE *fp, char iter_type, Label *label_list, FILE *memin)
     {
         FILE *asm_file = fp;
         char line [MAX_LINE_SIZE];
@@ -92,7 +92,7 @@ int iter_lines(FILE *fp, char iter_type, Label *label_list)
         while (fgets(line, MAX_LINE_SIZE, asm_file))
             {
                 if (iter_type == GET_LABEL) line_loc = search_label(line, line_index, line_loc, label_list);
-                else if (iter_type == FINAL_ITER) translate_file(line, line_index, line_loc, label_list);
+                else if (iter_type == FINAL_ITER) translate_file(line, line_index, line_loc, label_list, memin);
                 line_index++;
                 line_loc++;
             } 
@@ -102,10 +102,11 @@ int main()
         FILE *asm_file = fopen("Fibonacci\\fib.asm", "r"); // ! dont forget to change file name
         if (asm_file)
             {
+                FILE *memin = fopen("Fibonacci\\memin.txt", "w");
                 Label *label_list = labelNewLabel("", -1);
-                iter_lines(asm_file, GET_LABEL, label_list);
+                iter_lines(asm_file, GET_LABEL, label_list, memin);
                 fseek(asm_file, 0, 0);
-                iter_lines(asm_file, FINAL_ITER, label_list);
+                iter_lines(asm_file, FINAL_ITER, label_list, memin);
                 labelDeleteList(label_list);
             }
         fclose(asm_file);
