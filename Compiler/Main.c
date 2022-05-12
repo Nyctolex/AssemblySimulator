@@ -187,9 +187,9 @@ void write_to_file(char *memin_str, FILE *memin)
     {
         for (int i=0; i<MAX_MEMIN_SIZE*6-1; i++) fputc(memin_str[i], memin);
     }
-int main()
+int main(int arg_amount, char *arg_vals[])
     {
-        FILE *asm_file = fopen("Fibonacci\\fib.asm", "r"); // ! change input file name
+        FILE *asm_file = fopen(arg_vals[1], "r");
         if (asm_file)
             {
                 char memin_str[MAX_MEMIN_SIZE*6];
@@ -200,7 +200,7 @@ int main()
                     }
                 memin_str[0] = '0';
                 memin_str[MAX_MEMIN_SIZE*6] = '\0';
-                FILE *memin = fopen("Fibonacci\\memin.txt", "w"); // ! change output file name
+                FILE *memin = fopen(arg_vals[2], "w");
                 Label *label_list = labelNewLabel("", -1);
                 iter_lines(asm_file, GET_LABEL, label_list, memin, memin_str);
                 fseek(asm_file, 0, 0);
@@ -214,7 +214,6 @@ int main()
     }
 /*
     fixes:
-        add args from CMD
         remove zeros?
         add comments
 */
