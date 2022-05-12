@@ -18,6 +18,7 @@
         char sp[] = "sp";
         char ra[] = "ra";
     // * OpCodes
+        char word[] = ".word";
         char add[] = "add";
         char sub[] = "sub";
         char mul[] = "mul";
@@ -61,6 +62,7 @@
                 else if (!strcmp(exp, sp)) return 14;
                 else if (!strcmp(exp, ra)) return 15;
             // * OpCodes
+                else if (!strcmp(exp, word)) return -1;
                 else if (!strcmp(exp, add)) return 0;
                 else if (!strcmp(exp, sub)) return 1;
                 else if (!strcmp(exp, mul)) return 2;

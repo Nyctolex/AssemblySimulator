@@ -6,9 +6,12 @@
 
 # define MAX_LINE_SIZE 501
 # define GET_LABEL 0
-# define FINAL_ITER 1
+# define TRANSLATE_ITER 1
+# define MAX_MEMIN_SIZE 4096
 # define TRUE 1
 # define FALSE 0
+
+int memin_loc = 0;
 
 int is_imm(char *line)
     {
@@ -38,18 +41,74 @@ int search_label(char *line, int line_index, int line_loc, Label *label_list) //
         if (is_imm(line)) line_loc++;
         return line_loc;
     }
-void translate_file(char *line, int line_index, int line_loc, Label *label_list, FILE *memin)
+void add_to_memin_str(char *temp_str, char *memin_str, int size, int place)
+    {
+        if (size == 5 || size == 2)
+            {
+                for (int i=0; i<size; i++)
+                    {
+                        memin_str[memin_loc*6+i] = temp_str[i];
+                    }
+                if (size == 5) memin_loc++;
+            }
+        else if (size == 1)
+            {
+                memin_str[memin_loc*6+place+1] = temp_str[0];
+                if (place == 3) memin_loc++;
+            }
+    }
+void add_word(char *line, char *memin_str)
+    {
+        int line_loc;
+        char line_val[MAX_LINE_SIZE];
+        char temp_var[MAX_LINE_SIZE];
+        int counter = 0;
+        int j = 0;
+        for (int i = 0; i < MAX_LINE_SIZE; i++)
+            {
+                if (isspace(line[i])) continue;
+                if (isdigit(line[i]))
+                    {
+                        temp_var[j] = line[i];
+                        if (isspace(line[i+1]))
+                            {
+                                if (counter == 0)
+                                    {
+                                        line_loc = atoi(temp_var);
+                                        j = 0;
+                                        counter++;
+                                        continue;
+                                    }
+                                else if (counter == 1)
+                                    {
+                                        temp_var[j+1] = '\0';
+                                        sprintf(line_val, "%05X", atoi(temp_var));
+                                        break;
+                                    }
+                            }
+                        j++;
+                    }
+                if ((line[i] == '#') || (line[i] == '\n')) break;
+            }
+        int memin_loc_temp = memin_loc;
+        memin_loc = line_loc;
+        add_to_memin_str(line_val, memin_str, 5, 0);
+        memin_loc = memin_loc_temp;
+    }
+void translate_file(char *line, int line_index, int line_loc, Label *label_list, FILE *memin, char *memin_str)
     {
         char var[MAX_LINE_SIZE] = "";
         int counter = 0;
         int len = 0;
         int hex;
         Label *label;
+        char temp_str[4];
+        char temp_char[0];
         for (int i = 0; i < MAX_LINE_SIZE; i++)
             {
                 if (isspace(line[i])) continue;
-                else if (line[i] == ':') return;
-                else if (counter == 4 && isalpha(line[i]))
+                else if (line[i] == ':') return; // skip label line
+                else if (counter == 4 && isalpha(line[i])) // translate label
                     {
                         for (int j=i; !isspace(line[j]); j++)
                             {
@@ -57,23 +116,50 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list,
                                 var[++len] = '\0';
                             }
                         label = labelGetByName(label_list, var);
-                        fprintf (memin, "\n%05X", label -> location);
-                        break;
+                        sprintf(temp_str, "%05X", label -> location);
+                        add_to_memin_str(temp_str, memin_str, 5, 0);
+                        return;
                     }
-                else if (line[i] == ',' || line[i] == '$' || line[i] == '#')
+                else if (line[i] == ',' || line[i] == '$' || line[i] == '#') // translate reg name
                     {
-                        if ((isdigit(var[0]) || (var[0] == '-')) && atoi(var) != 0) fprintf(memin, "\n%05X", atoi(var)&0x000FFFFF);
-                        else if (is_imm(line) && atoi(var) == 0 && counter == 4) memin, fprintf(memin, "\n%05X", atoi(var));
+                        if ((isdigit(var[0]) || (var[0] == '-')) && atoi(var) != 0) // translate imm num
+                            {
+                                sprintf(temp_str, "%05X", atoi(var)&0x000FFFFF);
+                                add_to_memin_str(temp_str, memin_str, 5, 0);
+                                return;
+                            }
+                        else if (is_imm(line) && atoi(var) == 0 && counter == 4) // translate 0 imm num
+                            {
+                                sprintf(temp_str, "%05X", atoi(var));
+                                add_to_memin_str(temp_str, memin_str, 5, 0);
+                                return;
+                            }
                         else if (strlen(var) != 0 && !isdigit(var[0]))
                             {
                                 hex = compare(var);
-                                if (counter == 0) fprintf(memin, "%02X", hex);
-                                else fprintf(memin, "%01X", hex);
+                                if (hex == -1)
+                                    {
+                                        add_word(line, memin_str);
+                                        break;
+                                    }
+                                else
+                                    {
+                                        if (counter == 0) // opcode
+                                            {
+                                                sprintf(temp_str, "%02X", hex);
+                                                add_to_memin_str(temp_str, memin_str, 2, 0);
+                                            }
+                                        else // reg
+                                            {
+                                                sprintf(temp_char, "%01X", hex);
+                                                add_to_memin_str(temp_char, memin_str, 1, counter);
+                                            }
+                                    }
                                 var[0] = '\0';
                                 len = 0;
                                 counter++;
                             }
-                        if (line[i] == '#') break;
+                        if ((line[i] == '#') || (line[i] == '\n')) break;
                     }
                 else
                     {
@@ -81,9 +167,9 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list,
                         var[++len] = '\0';
                     }
             }
-        fprintf(memin, "\n");
+        return;
     }
-int iter_lines(FILE *fp, char iter_type, Label *label_list, FILE *memin)
+int iter_lines(FILE *fp, char iter_type, Label *label_list, FILE *memin, char *memin_str)
     {
         FILE *asm_file = fp;
         char line [MAX_LINE_SIZE];
@@ -92,23 +178,43 @@ int iter_lines(FILE *fp, char iter_type, Label *label_list, FILE *memin)
         while (fgets(line, MAX_LINE_SIZE, asm_file))
             {
                 if (iter_type == GET_LABEL) line_loc = search_label(line, line_index, line_loc, label_list);
-                else if (iter_type == FINAL_ITER) translate_file(line, line_index, line_loc, label_list, memin);
+                else if (iter_type == TRANSLATE_ITER) translate_file(line, line_index, line_loc, label_list, memin, memin_str);
                 line_index++;
                 line_loc++;
             } 
     }
+void write_to_file(char *memin_str, FILE *memin)
+    {
+        for (int i=0; i<MAX_MEMIN_SIZE*6-1; i++) fputc(memin_str[i], memin);
+    }
 int main()
     {
-        FILE *asm_file = fopen("Fibonacci\\fib.asm", "r"); // ! dont forget to change file name
+        FILE *asm_file = fopen("Fibonacci\\fib.asm", "r"); // ! change input file name
         if (asm_file)
             {
-                FILE *memin = fopen("Fibonacci\\memin.txt", "w");
+                char memin_str[MAX_MEMIN_SIZE*6];
+                for (int i=0; i<MAX_MEMIN_SIZE*6; i++)
+                    {
+                        if (((i+1)%6) == 0) memin_str[i] = '\n';
+                        else memin_str[i] = '0';
+                    }
+                memin_str[0] = '0';
+                memin_str[MAX_MEMIN_SIZE*6] = '\0';
+                FILE *memin = fopen("Fibonacci\\memin.txt", "w"); // ! change output file name
                 Label *label_list = labelNewLabel("", -1);
-                iter_lines(asm_file, GET_LABEL, label_list, memin);
+                iter_lines(asm_file, GET_LABEL, label_list, memin, memin_str);
                 fseek(asm_file, 0, 0);
-                iter_lines(asm_file, FINAL_ITER, label_list, memin);
+                iter_lines(asm_file, TRANSLATE_ITER, label_list, memin, memin_str);
+                write_to_file(memin_str, memin);
+                fclose(memin);
                 labelDeleteList(label_list);
             }
         fclose(asm_file);
         return 0;
     }
+/*
+    fixes:
+        add args from CMD
+        remove zeros?
+        add comments
+*/
