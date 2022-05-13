@@ -1,5 +1,5 @@
 #include "instruction.h"
-
+#include "dict.c"
 Instruction *instructionNewinstruction(int opcode, int rd, int rs, int rt, int imm, int location)
 {
     Instruction *new_instruction = (Instruction *)malloc(sizeof(Instruction));
@@ -103,6 +103,28 @@ int slice_atoi_hex(char str[], int start, int end)
 }
 
 void instructionPrintInstruction(Instruction *inst)
+{
+    char *opcode = int_to_opcode(inst->opcode);
+    char *rd = int_to_reg(inst->rd);
+    char *rs = int_to_reg(inst->rs);
+    char *rt = int_to_reg(inst->rt);
+
+    if (instructionType(inst) == R_TYPE)
+    {
+
+        printf("Location: %d    DATA: %s %s %s %s\n", inst->location, opcode, rd, rs, rt);
+    }
+    else
+    {
+        printf("Location: %d    DATA: %s %s %s %s    Imm:   %X\n", inst->location, opcode, rd, rs, rt, inst->imm);
+    }
+    free(opcode);
+    free(rd);
+    free(rs);
+    free(rt);
+}
+
+void instructionPrintInstructionHex(Instruction *inst)
 {
     if (instructionType(inst) == R_TYPE)
     {

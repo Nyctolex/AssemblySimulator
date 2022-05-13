@@ -4,6 +4,7 @@
 #include <stdlib.h>
 int main(int argc, char *argv[])
 {
+    int clk_cycle = 0;
 
     FILE *fp_memin = NULL, *fp_diskin = NULL, *fp_irq2in = NULL, *fp_memout = NULL,
          *fp_regout = NULL, *fp_trace = NULL, *fp_hwregtrace = NULL, *fp_cycles = NULL, *fp_leds = NULL, *fp_display7seg = NULL,
@@ -17,7 +18,10 @@ int main(int argc, char *argv[])
     int disk_memory[NUM_SECTORS][SECTOR_SIZE] = {0};
     int pc = 0, irq = 0, busy_with_interruption = 0, cycles;
 
-    if (argc != NUM_COMMANDLINE_PARAMETERS) // check command line arguments
+    int argc2 = NUM_COMMANDLINE_PARAMETERS;
+    char argv2[NUM_COMMANDLINE_PARAMETERS][500 + 1] = {"", "memin.txt", "diskin.txt", "irq2in.txt", "memout.txt", "regout.txt", "trace.txt", "hwregtrace.txt", "cycles.txt", "leds.txt", "display7seg.txt", "diskout.txt", "monitor.txt", "monitor.yuv"};
+
+    if (argc2 != NUM_COMMANDLINE_PARAMETERS) // check command line arguments
     {
         printf("Error: Incorrect command line arg6uments number\n");
         return 1;
@@ -28,29 +32,31 @@ int main(int argc, char *argv[])
     for (i = 1; i < output_file_index; i++)
     {
 
-        *file_pointers[i] = fopen(argv[i], "r");
-        if (file_pointers[i] == NULL)
+        *file_pointers[i] = fopen(argv2[i], "r");
+
+        if (*(file_pointers[i]) == NULL)
         {
-            printf("Error: The file %s couldn't open properly", argv[i]);
+            printf("Error: The file %s couldn't open properly", argv2[i]);
             return 1;
         }
     }
 
     // opening the output files
-    for (i = i; i < argc; i++)
+    for (i = i; i < argc2; i++)
     {
-        file_pointers[i] = fopen(argv[i], "w");
-        if (&(file_pointers[i]) == NULL)
+
+        *file_pointers[i] = fopen(argv2[i], "w");
+        if (*(file_pointers[i]) == NULL)
         {
-            printf("Error: The file %s couldn't open properly", argv[i]);
+            printf("Error: The file %s couldn't open properly", argv2[i]);
             return 1;
         }
     }
     get_instructions(fp_memin, instructions);
 
-    // run_instructions(instructions, reg, ioreg, clk_cycle, fp_trace);
-    write_regout(fp_regout, reg);
+    run_instructions(instructions, reg, ioreg, clk_cycle, fp_trace);
     write_cycles(fp_cycles, cycles);
+    write_regout(fp_regout, reg);
     instructionDeleteList(instructions);
     close_pf(file_pointers, argc);
     return 0;
@@ -73,11 +79,31 @@ void run_instructions(Instruction *instructions, int *reg, int *ioreg, int clk_c
     {
         current_instruction = instructionGetByLocation(instructions, pc);
         instructionPrintInstruction(current_instruction);
+
         // Write trace
         write_trace(fp_trace, pc, current_instruction, reg);
         // execute the next instruction from the assembly
         pc = decode_inst(pc, reg, ioreg, current_instruction, &clk_cycle);
+        print_reg_state(pc, reg, current_instruction);
     }
+}
+
+void print_reg_state(int pc, int *reg, Instruction *inst)
+{
+    const int reg_num = 15;
+    char reg_name[15][20] = {"zero", "imm", "v0", "a0", "a1", "a2", "a3", "t0", "t1", "t2", "s0", "s1", "s2", "gp", "sp", "ra"};
+    // int R0 = reg[0], R1 = reg[1], R2 = reg[2], R3 = reg[3], R4 = reg[4], R5 = reg[5], R6 = reg[6], R7 = reg[7], R8 = reg[8], R9 = reg[9], R10 = reg[10], R11 = reg[11], R12 = reg[12], R13 = reg[13], R14 = reg[14], R15 = reg[15];
+    printf("PC:%03X ", pc);
+    int i;
+    for (i = 0; i < reg_num; i++)
+    {
+        if (i == inst->rd || i == inst->rs || i == inst->rt)
+            printf("\033[0;31m");
+        printf("%s:%X  ", reg_name[i], reg[i]);
+        printf("\033[0m");
+    }
+    printf("\n\n");
+    // printf("PC:%03X Zero:%08X imm:%08X v0:%08X a0:%08X a1:%08X a2:%08X a3:%08X t0:%08X t1:%08X t2:%08X s0:%08X s1:%08X s2:%08X gp:%08X sp:%08X ra:%08X\n", pc, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15);
 }
 
 void write_cycles(FILE *fp_cycles, int cycles)
@@ -90,18 +116,18 @@ void write_cycles(FILE *fp_cycles, int cycles)
 void write_regout(FILE *fp_regout, int *reg)
 {
     int R0 = reg[0], R1 = reg[1], R2 = reg[2], R3 = reg[3], R4 = reg[4], R5 = reg[5], R6 = reg[6], R7 = reg[7], R8 = reg[8], R9 = reg[9], R10 = reg[10], R11 = reg[11], R12 = reg[12], R13 = reg[13], R14 = reg[14], R15 = reg[15];
-    fprintf(fp_regout, "%08X\n %08X\n %08X\n %08X\n %08X\n %08X\n %08X\n %08X\n %08X\n %08X\n %08X\n %08X\n %08X\n %08X\n", R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15);
+    fprintf(fp_regout, "%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n", R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15);
 }
 
 void write_trace(FILE *fp_trace, int pc, Instruction *inst, int *reg)
 {
     int R0 = reg[0], R1 = reg[1], R2 = reg[2], R3 = reg[3], R4 = reg[4], R5 = reg[5], R6 = reg[6], R7 = reg[7], R8 = reg[8], R9 = reg[9], R10 = reg[10], R11 = reg[11], R12 = reg[12], R13 = reg[13], R14 = reg[14], R15 = reg[15];
-    fprintf(fp_trace, "%03X %05X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X", pc, inst->opcode, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15);
+    fprintf(fp_trace, "%03X %05X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X\n", pc, inst->opcode, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15);
 }
 
 int decode_inst(int pc, int *reg, int *ioreg, Instruction *inst, int *cycle)
 {
-
+    int old_imm = inst->imm;
     int pc_adder = 1; // adding 1 or 2 according to the type of the instruction.
     int cycles_adder = 1;
     if (instructionType(inst) == I_TYPE)
@@ -113,6 +139,7 @@ int decode_inst(int pc, int *reg, int *ioreg, Instruction *inst, int *cycle)
     else
     {
         reg[IMM_REG] = 0;
+        old_imm = 0;
     }
     switch (inst->opcode)
     {
@@ -253,6 +280,8 @@ int decode_inst(int pc, int *reg, int *ioreg, Instruction *inst, int *cycle)
     default:
         pc = -1;
     }
+    reg[IMM_REG] = old_imm;
+    reg[zero] = 0;
     *cycle = *cycle + cycles_adder;
     return pc;
 }
@@ -275,5 +304,4 @@ void get_instructions(FILE *fp_memin, Instruction *head)
         }
         instructionAppendFromLine(head, cuurent_inst, imm_line, pc);
     }
-    // instructionPrintInstructions(head);
 }
