@@ -24,7 +24,12 @@ int is_imm(char *line)
 int add_label(char *line, int line_loc, Label *label_list)
     {
         char label [MAX_LINE_SIZE] = "";
-        for (int i = 0; line[i] != ':'; i++) label[i] = line[i];
+        int counter = 0;
+        for (int i = 0; line[i] != ':'; i++)
+            {
+                if (isspace(line[i])) counter++;
+                else label[i-counter] = line[i];
+            }
         labelAppendData(label_list, label, line_loc);
     }
 int search_label(char *line, int line_index, int line_loc, Label *label_list) // iterate a line and check if there is a label in it
@@ -66,7 +71,6 @@ void add_word(char *line, char *memin_str)
         int j = 0;
         for (int i = 0; i < MAX_LINE_SIZE; i++)
             {
-                if (isspace(line[i])) continue;
                 if (isdigit(line[i]))
                     {
                         temp_var[j] = line[i];
@@ -89,6 +93,7 @@ void add_word(char *line, char *memin_str)
                         j++;
                     }
                 if ((line[i] == '#') || (line[i] == '\n')) break;
+                if (isspace(line[i])) continue;
             }
         int memin_loc_temp = memin_loc;
         memin_loc = line_loc;
