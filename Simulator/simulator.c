@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     int reg[NUM_REGS] = {0}, ioreg[NUM_IOREGS] = {0};
     Instruction *instructions = instructionNewinstruction(-1, -1, -1, -1, -1, -1);
     int disk_memory[NUM_SECTORS][SECTOR_SIZE] = {0};
-    int pc = 0, irq = 0, busy_with_interruption = 0;
+    int pc = 0, irq = 0, busy_with_interruption = 0, cycles;
 
     if (argc != NUM_COMMANDLINE_PARAMETERS) // check command line arguments
     {
@@ -48,7 +48,9 @@ int main(int argc, char *argv[])
     }
     get_instructions(fp_memin, instructions);
 
-    // run_instructions(instructions, reg, ioreg);
+    // run_instructions(instructions, reg, ioreg, clk_cycle, fp_trace);
+    write_regout(fp_regout, reg);
+    write_cycles(fp_cycles, cycles);
     instructionDeleteList(instructions);
     close_pf(file_pointers, argc);
     return 0;
@@ -62,65 +64,135 @@ void close_pf(FILE **file_pointers[], int argc)
     }
 }
 
-void run_instructions(Instruction *instructions, int *reg, int *ioreg)
+void run_instructions(Instruction *instructions, int *reg, int *ioreg, int clk_cycle, FILE *fp_trace)
 {
     int pc = 0;
     Instruction *current_instruction;
+    // int irq = (irq0enable & irq0status) | (irq1enable & irq1status) | (irq2enable & irq2status);
     while (pc != -1)
     {
         current_instruction = instructionGetByLocation(instructions, pc);
         instructionPrintInstruction(current_instruction);
+        // Write trace
+        write_trace(fp_trace, pc, current_instruction, reg);
         // execute the next instruction from the assembly
-        pc = decode_inst(pc, reg, ioreg, current_instruction);
+        pc = decode_inst(pc, reg, ioreg, current_instruction, &clk_cycle);
     }
 }
 
-int decode_inst(int pc, int *reg, int *ioreg, Instruction *inst)
+void write_cycles(FILE *fp_cycles, int cycles)
 {
+    int pc_adder = 1; // adding 1 or 2 according to the type of the instruction..
+
+    fprintf(fp_cycles, "%d", cycles);
+}
+
+void write_regout(FILE *fp_regout, int *reg)
+{
+    int R0 = reg[0], R1 = reg[1], R2 = reg[2], R3 = reg[3], R4 = reg[4], R5 = reg[5], R6 = reg[6], R7 = reg[7], R8 = reg[8], R9 = reg[9], R10 = reg[10], R11 = reg[11], R12 = reg[12], R13 = reg[13], R14 = reg[14], R15 = reg[15];
+    fprintf(fp_regout, "%08X\n %08X\n %08X\n %08X\n %08X\n %08X\n %08X\n %08X\n %08X\n %08X\n %08X\n %08X\n %08X\n %08X\n", R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15);
+}
+
+void write_trace(FILE *fp_trace, int pc, Instruction *inst, int *reg)
+{
+    int R0 = reg[0], R1 = reg[1], R2 = reg[2], R3 = reg[3], R4 = reg[4], R5 = reg[5], R6 = reg[6], R7 = reg[7], R8 = reg[8], R9 = reg[9], R10 = reg[10], R11 = reg[11], R12 = reg[12], R13 = reg[13], R14 = reg[14], R15 = reg[15];
+    fprintf(fp_trace, "%03X %05X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X", pc, inst->opcode, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15);
+}
+
+int decode_inst(int pc, int *reg, int *ioreg, Instruction *inst, int *cycle)
+{
+
     int pc_adder = 1; // adding 1 or 2 according to the type of the instruction.
+    int cycles_adder = 1;
     if (instructionType(inst) == I_TYPE)
     {
+        cycles_adder = 2;
         reg[IMM_REG] = inst->imm;
         pc_adder = 2;
+    }
+    else
+    {
+        reg[IMM_REG] = 0;
     }
     switch (inst->opcode)
     {
     case 0: // add
-        reg[inst->rd] = reg[inst->rs] + reg[inst->rt];
         pc += pc_adder;
+        if (inst->rd < 2) // wrting to REG0 or REG IMM
+        {
+            break;
+        }
+        reg[inst->rd] = reg[inst->rs] + reg[inst->rt];
+
         break;
     case 1: // sub
-        reg[inst->rd] = reg[inst->rs] - reg[inst->rt];
         pc += pc_adder;
+        if (inst->rd < 2) // wrting to REG0 or REG IMM
+        {
+            break;
+        }
+        reg[inst->rd] = reg[inst->rs] - reg[inst->rt];
+
         break;
     case 2: // mul
-        reg[inst->rd] = reg[inst->rs] * reg[inst->rt];
         pc += pc_adder;
+        if (inst->rd < 2) // wrting to REG0 or REG IMM
+        {
+            break;
+        }
+        reg[inst->rd] = reg[inst->rs] * reg[inst->rt];
         break;
     case 3: // and
-        reg[inst->rd] = reg[inst->rs] & reg[inst->rt];
         pc += pc_adder;
-        ;
+        if (inst->rd < 2) // wrting to REG0 or REG IMM
+        {
+            break;
+        }
+        reg[inst->rd] = reg[inst->rs] & reg[inst->rt];
+
         break;
     case 4: // or
-        reg[inst->rd] = reg[inst->rs] | reg[inst->rt];
         pc += pc_adder;
+        if (inst->rd < 2) // wrting to REG0 or REG IMM
+        {
+            break;
+        }
+        reg[inst->rd] = reg[inst->rs] | reg[inst->rt];
+
         break;
     case 5: // xor
-        reg[inst->rd] = reg[inst->rs] ^ reg[inst->rt];
         pc += pc_adder;
+        if (inst->rd < 2) // wrting to REG0 or REG IMM
+        {
+            break;
+        }
+        reg[inst->rd] = reg[inst->rs] ^ reg[inst->rt];
         break;
     case 6: // sll
-        reg[inst->rd] = reg[inst->rs] << reg[inst->rt];
         pc += pc_adder;
+        if (inst->rd < 2) // wrting to REG0 or REG IMM
+        {
+            break;
+        }
+        reg[inst->rd] = reg[inst->rs] << reg[inst->rt];
+
         break;
     case 7: // sra
-        reg[inst->rd] = reg[inst->rs] >> reg[inst->rt];
         pc += pc_adder;
+        if (inst->rd < 2) // wrting to REG0 or REG IMM
+        {
+            break;
+        }
+        reg[inst->rd] = reg[inst->rs] >> reg[inst->rt];
+
         break;
     case 8: // srl
-        reg[inst->rd] = ((unsigned int)reg[inst->rs]) >> reg[inst->rt];
         pc += pc_adder;
+        if (inst->rd < 2) // wrting to REG0 or REG IMM
+        {
+            break;
+        }
+        reg[inst->rd] = ((unsigned int)reg[inst->rs]) >> reg[inst->rt];
         break;
     case 9: // beq
         if (reg[inst->rs] == reg[inst->rt])
@@ -164,8 +236,10 @@ int decode_inst(int pc, int *reg, int *ioreg, Instruction *inst)
         pc = reg[inst->rs];
         break;
     case 16: // lw
+        cycles_adder = 3;
         break;
     case 17: // sw
+        cycles_adder = 3;
         break;
     case 18: // reti
         break;
@@ -179,7 +253,7 @@ int decode_inst(int pc, int *reg, int *ioreg, Instruction *inst)
     default:
         pc = -1;
     }
-
+    *cycle = *cycle + cycles_adder;
     return pc;
 }
 
