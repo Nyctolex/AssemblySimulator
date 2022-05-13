@@ -1,5 +1,5 @@
 #ifndef REGHISTERCONST_H
-#define REGHISTERCONST  
+#define REGHISTERCONST
 #define TRUE 1
 #define FALSE 0
 #define ZERO "0"

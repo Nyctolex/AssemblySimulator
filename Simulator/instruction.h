@@ -20,7 +20,6 @@ Instruction *instructionLast(Instruction *head);
 void instructionAppendNode(Instruction *head, Instruction *node);
 int instructionType(Instruction *inst);
 int instructionTypeFromLine(char *line);
-// void instructionInitFromLine(Instruction *inst, char *line, char *imm, int location);
 void instructionAppendData(Instruction *head, int opcode, int rd, int rs, int rt, int imm, int location);
 void instructionAppendFromLine(Instruction *head, char *line, char *imm_line, int location);
 int slice_atoi_hex(char str[], int start, int end);
