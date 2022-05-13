@@ -106,8 +106,7 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list,
         char temp_char[0];
         for (int i = 0; i < MAX_LINE_SIZE; i++)
             {
-                if (isspace(line[i])) continue;
-                else if (line[i] == ':') return; // skip label line
+                if (line[i] == ':') return; // skip label line
                 else if (counter == 4 && isalpha(line[i])) // translate label
                     {
                         for (int j=i; !isspace(line[j]); j++)
@@ -120,7 +119,7 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list,
                         add_to_memin_str(temp_str, memin_str, 5, 0);
                         return;
                     }
-                else if (line[i] == ',' || line[i] == '$' || line[i] == '#') // translate reg name
+                else if (line[i] == ',' || line[i] == '$' || line[i] == '#' || line[i] == '\n') // translate reg name
                     {
                         if ((isdigit(var[0]) || (var[0] == '-')) && atoi(var) != 0) // translate imm num
                             {
@@ -161,6 +160,7 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list,
                             }
                         if ((line[i] == '#') || (line[i] == '\n')) break;
                     }
+                else if (isspace(line[i])) continue;
                 else
                     {
                         var[len] = line[i];
