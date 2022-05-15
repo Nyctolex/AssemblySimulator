@@ -1,0 +1,5 @@
+﻿  simulator.c
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\AssemblySimulator\Simulator\ConsoleApplication1\simulator.h(7,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\AssemblySimulator\Simulator\ConsoleApplication1\simulator.c : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\AssemblySimulator\Simulator\ConsoleApplication1\simulator.c(114,25): warning C4013: 'decode_inst' undefined; assuming extern returning int
+  ConsoleApplication1.vcxproj -> C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\AssemblySimulator\Simulator\x64\Debug\ConsoleApplication1.exe
