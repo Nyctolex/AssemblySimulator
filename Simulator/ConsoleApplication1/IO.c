@@ -40,5 +40,5 @@ void add_irq2(FILE *irq2in, int *irq2)
             {
                 irq2[i++] = atoi(line);
             }
-        irq2[i] = '\0';
+        irq2[i] = '-1';
     }
