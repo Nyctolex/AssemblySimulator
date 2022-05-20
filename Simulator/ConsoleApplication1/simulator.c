@@ -18,7 +18,8 @@ int main(int argc, char* argv[])
     FILE** file_pointers[] = { NULL, &fp_memin, &fp_diskin, &fp_irq2in, &fp_memout,
                               &fp_regout, &fp_trace, &fp_hwregtrace, &fp_cycles, &fp_leds, &fp_display7seg, &fp_diskout, &fp_monitor_txt, &fp_monitor_yuv };
     
-    //int irq2[200] = add_irq2(fp_irq2in);
+    int irq2[200];
+
     int is_in_task = 0;
     //check_interrupts(int ioreg[], int* pc, int is_task, int irq2[]);
     // when calling to reti set to zero
@@ -65,8 +66,9 @@ int main(int argc, char* argv[])
             return 1;
         }
     }
+    add_irq2(fp_irq2in, irq2);
     get_instructions(fp_memin, instructions, memory);
-    run_instructions(instructions, regs, ioreg, fp_trace, memory);
+    run_instructions(instructions, regs, ioreg, fp_trace, memory, &is_in_task, irq2);
     write_cycles(fp_cycles, cycles);
     write_regout(fp_regout, regs);
     instructionDeleteList(instructions);
@@ -83,22 +85,24 @@ void close_pf(FILE** file_pointers[], int argc)
 }
 
 //fetching the instructions and executing them
-void run_instructions(Instruction* instructions, int regs[NUM_REGS], int* ioreg, FILE* fp_trace, char memory[][LINE_MAX_SIZE])
+void run_instructions(Instruction* instructions, int regs[NUM_REGS], int* ioreg, FILE* fp_trace, char memory[][LINE_MAX_SIZE], int* is_task, int irq2[])
 {
     
     int clk_cycle; //This is wrong but its good for now
     int pc = 0;
+    int* pc_pointer = &pc;
     Instruction* current_instruction;
-    // int irq = (irq0enable & irq0status) | (irq1enable & irq1status) | (irq2enable & irq2status);
     while (pc != -1)
     {
+        check_interrupts(ioreg, pc_pointer, is_task, irq2);
         current_instruction = instructionGetByLocation(instructions, pc);
         instructionPrintInstruction(current_instruction);
 
         // Write trace
         write_trace(fp_trace, pc, current_instruction,regs);
+
         // execute the next instruction from the assembly
-        pc = decode_inst(pc, regs, ioreg, current_instruction, memory);
+        decode_inst(regs, ioreg, current_instruction, memory, pc_pointer, is_task, irq2);
         print_reg_state(pc, regs, current_instruction);
      
     }
@@ -134,7 +138,7 @@ void write_cycles(FILE* fp_cycles, int cycles)
 void write_regout(FILE* fp_regout, int* reg)
 {
     int R0 = reg[0], R1 = reg[1], R2 = reg[2], R3 = reg[3], R4 = reg[4], R5 = reg[5], R6 = reg[6], R7 = reg[7], R8 = reg[8], R9 = reg[9], R10 = reg[10], R11 = reg[11], R12 = reg[12], R13 = reg[13], R14 = reg[14], R15 = reg[15];
-    fprintf(fp_regout, "%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n", R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15);
+    fprintf(fp_regout, "%08d\n%08d\n%08d\n%08d\n%08d\n%08d\n%08d\n%08d\n%08d\n%08d\n%08d\n%08d\n%08d\n%08d\n", R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15);
 }
 
 void write_trace(FILE* fp_trace, int pc, Instruction* inst, int* regs)
@@ -143,7 +147,7 @@ void write_trace(FILE* fp_trace, int pc, Instruction* inst, int* regs)
     fprintf(fp_trace, "%03X %05X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X\n", pc, inst->opcode, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15);
 }
 // decoding the instruction and executing the correct operation.
-int decode_inst(int pc, int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MAX_SIZE])
+void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MAX_SIZE], int* pc_pointer, int* is_task, int irq2[])
 {
     char int_to_char[LINE_MAX_SIZE] = { '\0' };
     int* cycle = &ioreg[CLKS_REG];
@@ -164,7 +168,7 @@ int decode_inst(int pc, int* regs, int* ioreg, Instruction* inst, char memory[][
     switch (inst->opcode)
     {
     case 0: // add
-        pc += pc_adder;
+        *pc_pointer += pc_adder;
         if (inst->rd < 2) // wrting to REG0 or REG IMM
         {
             break;
@@ -173,7 +177,7 @@ int decode_inst(int pc, int* regs, int* ioreg, Instruction* inst, char memory[][
 
         break;
     case 1: // sub
-        pc += pc_adder;
+        *pc_pointer += pc_adder;
         if (inst->rd < 2) // wrting to REG0 or REG IMM
         {
             break;
@@ -182,7 +186,7 @@ int decode_inst(int pc, int* regs, int* ioreg, Instruction* inst, char memory[][
 
         break;
     case 2: // mul
-        pc += pc_adder;
+        *pc_pointer += pc_adder;
         if (inst->rd < 2) // wrting to REG0 or REG IMM
         {
             break;
@@ -190,7 +194,7 @@ int decode_inst(int pc, int* regs, int* ioreg, Instruction* inst, char memory[][
         regs[inst->rd] = regs[inst->rs] * regs[inst->rt];
         break;
     case 3: // and
-        pc += pc_adder;
+        *pc_pointer += pc_adder;
         if (inst->rd < 2) // wrting to REG0 or REG IMM
         {
             break;
@@ -199,7 +203,7 @@ int decode_inst(int pc, int* regs, int* ioreg, Instruction* inst, char memory[][
 
         break;
     case 4: // or
-        pc += pc_adder;
+        *pc_pointer += pc_adder;
         if (inst->rd < 2) // wrting to REG0 or REG IMM
         {
             break;
@@ -208,7 +212,7 @@ int decode_inst(int pc, int* regs, int* ioreg, Instruction* inst, char memory[][
 
         break;
     case 5: // xor
-        pc += pc_adder;
+        *pc_pointer += pc_adder;
         if (inst->rd < 2) // wrting to REG0 or REG IMM
         {
             break;
@@ -216,7 +220,7 @@ int decode_inst(int pc, int* regs, int* ioreg, Instruction* inst, char memory[][
         regs[inst->rd] = regs[inst->rs] ^ regs[inst->rt];
         break;
     case 6: // sll
-        pc += pc_adder;
+        *pc_pointer += pc_adder;
         if (inst->rd < 2) // wrting to REG0 or REG IMM
         {
             break;
@@ -225,7 +229,7 @@ int decode_inst(int pc, int* regs, int* ioreg, Instruction* inst, char memory[][
 
         break;
     case 7: // sra
-        pc += pc_adder;
+        *pc_pointer += pc_adder;
         if (inst->rd < 2) // wrting to REG0 or REG IMM
         {
             break;
@@ -234,7 +238,7 @@ int decode_inst(int pc, int* regs, int* ioreg, Instruction* inst, char memory[][
 
         break;
     case 8: // srl
-        pc += pc_adder;
+        *pc_pointer += pc_adder;
         if (inst->rd < 2) // wrting to REG0 or REG IMM
         {
             break;
@@ -243,53 +247,53 @@ int decode_inst(int pc, int* regs, int* ioreg, Instruction* inst, char memory[][
         break;
     case 9: // beq
         if (regs[inst->rs] == regs[inst->rt])
-            pc = regs[inst->rd];
+            *pc_pointer = regs[inst->rd];
         else
-            pc += pc_adder;
+            *pc_pointer += pc_adder;
         break;
     case 10: // bne
         if (regs[inst->rs] != regs[inst->rt])
-            pc = regs[inst->rd];
+            *pc_pointer = regs[inst->rd];
         else
-            pc += pc_adder;
+            *pc_pointer += pc_adder;
         break;
     case 11: // blt
         if (regs[inst->rs] < regs[inst->rt])
-            pc = regs[inst->rd];
+            *pc_pointer = regs[inst->rd];
         else
-            pc += pc_adder;
+            *pc_pointer += pc_adder;
         break;
     case 12: // bgt
         if (regs[inst->rs] > regs[inst->rt])
-            pc = regs[inst->rd];
+            *pc_pointer = regs[inst->rd];
         else
-            pc += pc_adder;
+            *pc_pointer += pc_adder;
         break;
     case 13: // ble
         if (regs[inst->rs] <= regs[inst->rt])
-            pc = regs[inst->rd];
+            *pc_pointer = regs[inst->rd];
         else
-            pc += pc_adder;
+            *pc_pointer += pc_adder;
         break;
     case 14: // bge
         if (regs[inst->rs] >= regs[inst->rt])
-            pc = regs[inst->rd];
+            *pc_pointer = regs[inst->rd];
         else
-            pc += pc_adder;
+            *pc_pointer += pc_adder;
         break;
     case 15: // jal
-        pc += pc_adder;
-        regs[inst->rd] = pc;
-        pc = regs[inst->rs];
+        *pc_pointer += pc_adder;
+        regs[inst->rd] = *pc_pointer;
+        *pc_pointer = regs[inst->rs];
         break;
     case 16: // lw
-        pc += pc_adder;
+        *pc_pointer += pc_adder;
         printf("Loading data from line:    %d\n", regs[inst->rs] + regs[inst->rt]);
         regs[inst->rd] = extend_sign(strtoul(memory[regs[inst->rs] + regs[inst->rt]], NULL, 16));
         cycles_adder = 3; //! need to call guy's code
         break;
     case 17: // sw
-        pc += pc_adder;
+        *pc_pointer += pc_adder;
         printf("saving data to line:    %d\n", regs[inst->rs] + regs[inst->rt]);
         sprintf(memory[regs[inst->rs] + regs[inst->rt]], "%05X", regs[inst->rd]);
         cycles_adder = 3; //! need to call guy's code
@@ -301,15 +305,14 @@ int decode_inst(int pc, int* regs, int* ioreg, Instruction* inst, char memory[][
     case 20: // out
         break;
     case 21: // halt
-        pc = -1;
+        *pc_pointer = -1;
         break;
     default:
-        pc = -1;
+        *pc_pointer = -1;
     }
     regs[IMM_REG] = old_imm;
     regs[ZERO_REG] = 0;
     *cycle = *cycle + cycles_adder;
-    return pc;
 }
 // writing the memin into the memory array, and creating the instration linked list.
 void get_instructions(FILE* fp_memin, Instruction* head, char memory[][LINE_MAX_SIZE])

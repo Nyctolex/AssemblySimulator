@@ -24,6 +24,9 @@
     <ClCompile Include="dict.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="IO.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="simulator.h">
@@ -33,6 +36,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="dict.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IO.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

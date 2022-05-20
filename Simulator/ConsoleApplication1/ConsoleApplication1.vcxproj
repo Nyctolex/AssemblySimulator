@@ -142,10 +142,12 @@
   <ItemGroup>
     <ClCompile Include="dict.c" />
     <ClCompile Include="instruction.c" />
+    <ClCompile Include="IO.c" />
     <ClCompile Include="simulator.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dict.h" />
+    <ClInclude Include="IO.h" />
     <ClInclude Include="simulator.h" />
     <ClInclude Include="instruction.h" />
   </ItemGroup>

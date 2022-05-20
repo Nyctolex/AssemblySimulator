@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "instruction.h"
-//#include "io.h"
+#include "IO.h"
 
 #define ZERO_REG 0
 #define CLKS_REG 8
@@ -40,8 +40,8 @@
 
 
 void write_regout(FILE* fp_regout, int* reg);
-void run_instructions(Instruction* instructions, int regs[NUM_REGS], int* ioreg, FILE* fp_trace, char memory[][LINE_MAX_SIZE]);
-int decode_inst(int pc, int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MAX_SIZE]);
+void run_instructions(Instruction* instructions, int regs[NUM_REGS], int* ioreg, FILE* fp_trace, char memory[][LINE_MAX_SIZE], int* is_task, int irq2[]);
+void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MAX_SIZE], int* pc_pointer, int* is_task, int irq2[]);
 void close_pf(FILE** file_pointers[], int argc);
 void print_reg_state(int pc, int* reg, Instruction* inst);
 void write_cycles(FILE* fp_cycles, int cycles);
