@@ -2,7 +2,7 @@
 # include <string.h>
 # include <ctype.h>
 # include "Label.c"
-# include "dict.c"
+# include <dict.h>
 
 # define MAX_LINE_SIZE 501
 # define GET_LABEL 0
@@ -242,4 +242,5 @@ int main(int arg_amount, char *arg_vals[])
     fixes:
         remove zeros?
         add comments
+        add header file
 */

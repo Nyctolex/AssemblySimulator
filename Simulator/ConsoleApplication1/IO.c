@@ -1,4 +1,4 @@
-# define max_irq2_line 20
+# include <IO.h>
 int timer(int ioreg[])
     {
         if (++ioreg[12] == ioreg[13]) // check if the timer value is the maximal
