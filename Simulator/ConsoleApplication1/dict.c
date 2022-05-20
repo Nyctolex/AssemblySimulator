@@ -6,14 +6,13 @@
 // * Registers
 
 // * Compare Strings
-#define zero "zero"
 int dict_compare(char* exp) // returns the expression's opcode
 {
     // * Registers
     if (!strcmp(exp, zero))
         return 0; 
 
-    else if (!strcmp(exp, IMM)) return 1;
+    else if (!strcmp(exp, imm_dict)) return 1;
     else if (!strcmp(exp, v0))
         return 2;
     else if (!strcmp(exp, a0))

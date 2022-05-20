@@ -1,18 +1,9 @@
 #include "simulator.h"
-#include "instruction.h"
-//#include "dict.h"
-#include <stdio.h>
-#include <stdlib.h>
 #define _CRT_SECURE_NO_WARNINGS
 int main(int argc, char* argv[])
 {
 
-
-    char* reg_srt = (char*)malloc(sizeof(char) * 20);
-    strcpy(reg_srt, "alex");
-
-
-    int clk_cycle = 0;
+    int clk_cycle = 0; //! Supposed to be part of the ioreg and wehre the fuck the stack pointer is set to?
 
     FILE* fp_memin = NULL, * fp_diskin = NULL, * fp_irq2in = NULL, * fp_memout = NULL,
         * fp_regout = NULL, * fp_trace = NULL, * fp_hwregtrace = NULL, * fp_cycles = NULL, * fp_leds = NULL, * fp_display7seg = NULL,
@@ -22,16 +13,19 @@ int main(int argc, char* argv[])
                               &fp_regout, &fp_trace, &fp_hwregtrace, &fp_cycles, &fp_leds, &fp_display7seg, &fp_diskout, &fp_monitor_txt, &fp_monitor_yuv };
     const int output_file_index = 4; // All file after this inex are output files
     int reg[NUM_REGS] = { 0 }, ioreg[NUM_IOREGS] = { 0 };
-    Instruction* instructions = instructionNewinstruction(-1, -1, -1, -1, -1, -1);
+    reg[SP_REG] = MAX_LINES;
+
+    Instruction* instructions = instructionNewinstruction(-1, -1, -1, -1, -1, -1); // initiation the head of the linked list.
+    char memory[MAX_LINES][LINE_MAX_SIZE];
     int disk_memory[NUM_SECTORS][SECTOR_SIZE] = { 0 };
     int pc = 0, irq = 0, busy_with_interruption = 0, cycles=0;
 
-    int argc2 = NUM_COMMANDLINE_PARAMETERS;
+    int argc2 = NUM_COMMANDLINE_PARAMETERS; //temporary only
     char argv2[NUM_COMMANDLINE_PARAMETERS][500 + 1] = { "", "memin.txt", "diskin.txt", "irq2in.txt", "memout.txt", "regout.txt", "trace.txt", "hwregtrace.txt", "cycles.txt", "leds.txt", "display7seg.txt", "diskout.txt", "monitor.txt", "monitor.yuv" };
 
     if (argc2 != NUM_COMMANDLINE_PARAMETERS) // check command line arguments
     {
-        printf("Error: Incorrect command line arg6uments number\n");
+        printf("Error: Incorrect command line arguments number\n");
         return 1;
     }
 
@@ -48,7 +42,6 @@ int main(int argc, char* argv[])
             return 1;
         }
     }
-
     // opening the output files
     for (i = i; i < argc2; i++)
     {
@@ -60,8 +53,7 @@ int main(int argc, char* argv[])
             return 1;
         }
     }
-    get_instructions(fp_memin, instructions);
-
+    get_instructions(fp_memin, instructions, memory);
     run_instructions(instructions, reg, ioreg, clk_cycle, fp_trace);
     write_cycles(fp_cycles, cycles);
     write_regout(fp_regout, reg);
@@ -69,24 +61,7 @@ int main(int argc, char* argv[])
     close_pf(file_pointers, argc);
     return 0;
 }
-
-void debug_output(FILE* fp_debug, int pc, int* reg, Instruction* inst, int counter)
-{
-    const int reg_num = 16;
-    char reg_name[16][20] = { "zero", "imm", "v0", "a0", "a1", "a2", "a3", "t0", "t1", "t2", "s0", "s1", "s2", "gp", "sp", "ra" };
-    int i;
-    fprintf(fp_debug, "{\n"); // new line object
-    fprintf(fp_debug, "\"loc\":%d,\n", inst->location);
-    for (i = 0; i < reg_num; i++)
-
-    {
-        fprintf(fp_debug, "     \"%s\":%d", reg_name[i], reg[i]);
-        if (i!= reg_num-1) fprintf(fp_debug, ",\n"); 
-    }
-    fprintf(fp_debug, "}");
-    fprintf(fp_debug, "\n\n");
-}
-
+//closing all of the files we opened
 void close_pf(FILE** file_pointers[], int argc)
 {
     for (int i = 1; i < argc; i++)
@@ -95,11 +70,10 @@ void close_pf(FILE** file_pointers[], int argc)
     }
 }
 
+//fetching the instructions and executing them
 void run_instructions(Instruction* instructions, int* reg, int* ioreg, int clk_cycle, FILE* fp_trace)
 {
-    FILE* fp_debug = fopen("debug.json", "w");
-    fprintf(fp_debug, "[");
-    int counter = 0; // counter for the debug
+
     int pc = 0;
     Instruction* current_instruction;
     // int irq = (irq0enable & irq0status) | (irq1enable & irq1status) | (irq2enable & irq2status);
@@ -113,17 +87,12 @@ void run_instructions(Instruction* instructions, int* reg, int* ioreg, int clk_c
         // execute the next instruction from the assembly
         pc = decode_inst(pc, reg, ioreg, current_instruction, &clk_cycle);
         print_reg_state(pc, reg, current_instruction);
-
-         debug_output(fp_debug, pc, reg, current_instruction, counter);
-        counter++; // counter for the debug
-
-        if (pc!=-1)fprintf(fp_debug, ",");
      
     }
-    fprintf(fp_debug, "]");
-    fclose(fp_debug);
+
 }
 
+// help us debug the asm programs.
 void print_reg_state(int pc, int* reg, Instruction* inst)
 {
     const int reg_num = 16;
@@ -160,7 +129,7 @@ void write_trace(FILE* fp_trace, int pc, Instruction* inst, int* reg)
     int R0 = reg[0], R1 = reg[1], R2 = reg[2], R3 = reg[3], R4 = reg[4], R5 = reg[5], R6 = reg[6], R7 = reg[7], R8 = reg[8], R9 = reg[9], R10 = reg[10], R11 = reg[11], R12 = reg[12], R13 = reg[13], R14 = reg[14], R15 = reg[15];
     fprintf(fp_trace, "%03X %05X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X\n", pc, inst->opcode, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15);
 }
-
+// decoding the instruction and executing the correct operation.
 int decode_inst(int pc, int* reg, int* ioreg, Instruction* inst, int* cycle)
 {
     int old_imm = inst->imm;
@@ -299,10 +268,10 @@ int decode_inst(int pc, int* reg, int* ioreg, Instruction* inst, int* cycle)
         pc = reg[inst->rs];
         break;
     case 16: // lw
-        cycles_adder = 3;
+        cycles_adder = 3; //! need to call guy's code
         break;
     case 17: // sw
-        cycles_adder = 3;
+        cycles_adder = 3; //! need to call guy's code
         break;
     case 18: // reti
         break;
@@ -317,12 +286,12 @@ int decode_inst(int pc, int* reg, int* ioreg, Instruction* inst, int* cycle)
         pc = -1;
     }
     reg[IMM_REG] = old_imm;
-    reg[ZERO] = 0;
+    reg[ZERO_REG] = 0;
     *cycle = *cycle + cycles_adder;
     return pc;
 }
-
-void get_instructions(FILE* fp_memin, Instruction* head)
+// writing the memin into the memory array, and creating the instration linked list.
+void get_instructions(FILE* fp_memin, Instruction* head, char memory[MAX_LINES][LINE_SIZE])
 {
     int pc = 0;
     int next_pc = 0;
@@ -332,11 +301,16 @@ void get_instructions(FILE* fp_memin, Instruction* head)
     {
         pc = next_pc;
         cuurent_inst[strcspn(cuurent_inst, "\r\n")] = '\0'; // remove \n and \r
+        
+        strcpy(memory[pc], cuurent_inst);
         next_pc++;
         if (instructionTypeFromLine(cuurent_inst) == I_TYPE)
         {
             fgets(imm_line, LINE_MAX_SIZE, fp_memin);
+            imm_line[strcspn(imm_line, "\r\n")] = '\0'; // remove \n and \r
+            strcpy(memory[pc], imm_line);
             next_pc++;
+            
         }
         instructionAppendFromLine(head, cuurent_inst, imm_line, pc);
     }

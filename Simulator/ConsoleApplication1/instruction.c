@@ -1,6 +1,6 @@
 #include "instruction.h"
-#include "dict.h"
-#define _CRT_SECURE_NO_WARNINGS
+//#include "dict.h"
+//#define _CRT_SECURE_NO_WARNINGS
 Instruction* instructionNewinstruction(int opcode, int rd, int rs, int rt, int imm, int location)
 {
     Instruction* new_instruction = (Instruction*)malloc(sizeof(Instruction));
@@ -88,7 +88,7 @@ void instructionAppendFromLine(Instruction* head, char* line, char* imm_line, in
     int imm = 0;
     if (instructionTypeFromLine(line) == I_TYPE)
     {
-        imm = strtoul(imm_line, NULL, 16);
+        imm = extend_sign(strtoul(imm_line, NULL, 16));
     }
     instructionAppendData(head, opcode, rd, rs, rt, imm, location);
 }
@@ -102,6 +102,20 @@ int slice_atoi_hex(char str[], int start, int end)
     tmp[len] = '\0';
     return strtoul(tmp, NULL, 16);
 }
+
+int extend_sign(int num)
+{
+    int mask_extend = 0xFFF00000; //sign externtion
+    int mask_msb = 0x80000; // mast to determine the msb
+    int sign = mask_msb & num;
+    //if the msb is not 0
+    if (sign > 0) {
+
+        num = mask_extend | num;
+    }
+    return num;
+}
+
 
 char* int_to_opcode(int opcode)
 {
@@ -193,7 +207,7 @@ char* int_to_reg(int reg)
         strcpy(reg_srt, zero);
         break;
     case 1:
-        strcpy(reg_srt, IMM);
+        strcpy(reg_srt, imm_dict);
         break;
     case 2:
         strcpy(reg_srt, v0);
@@ -243,6 +257,9 @@ char* int_to_reg(int reg)
 
     return reg_srt;
 }
+
+
+
 void instructionPrintInstruction(Instruction* inst)
 {
 

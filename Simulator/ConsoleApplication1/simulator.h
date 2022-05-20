@@ -1,19 +1,18 @@
+#pragma once 
 #ifndef _SIMULATOR_H
 #define _SIMULATOR_H
-
-
-
-
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "instruction.h"
 
-#define ZERO 0
+#define ZERO_REG 0
+#define SP_REG 14
 
 #define INST_SIZE 12
 
+#define LINE_SIZE 5
 #define NUM_REGS 16
 #define NUM_IOREGS 23
 #define MAX_LINES 4096

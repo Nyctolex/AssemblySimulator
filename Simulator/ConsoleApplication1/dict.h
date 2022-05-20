@@ -3,7 +3,7 @@
 #define _DICT_H
 
 #define zero "zero"
-#define IMM  "imm"
+#define imm_dict  "imm"
 #define v0  "v0"
 #define a0  "a0"
 #define a1  "a1"
