@@ -32,7 +32,7 @@ int check_interrupts(int ioreg[], int *pc, int *is_task, int irq2[])
                 irq(ioreg, pc, is_task);
         return;
     }
-int add_irq2(int *irq2in)
+void add_irq2(FILE *irq2in, int *irq2)
     {
         char line [max_irq2_line];
         int i=0;
@@ -41,5 +41,4 @@ int add_irq2(int *irq2in)
                 irq2[i++] = atoi(line);
             }
         irq2[i] = '\0';
-        return (irq2);
     }
