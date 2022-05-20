@@ -62,6 +62,18 @@ void add_to_memin_str(char *temp_str, char *memin_str, int size, int place)
                 if (place == 3) memin_loc++;
             }
     }
+int extend_sign(int num)
+{
+    int mask_extend = 0xFFF00000; //sign externtion
+    int mask_msb = 0x80000; // mast to determine the msb
+    int sign = mask_msb & num;
+    //if the msb is not 0
+    if (sign > 0) {
+
+        num = mask_extend | num;
+    }
+    return num;
+}
 void add_word(char *line, char *memin_str)
     {
         int line_loc;
@@ -69,16 +81,25 @@ void add_word(char *line, char *memin_str)
         char temp_var[MAX_LINE_SIZE];
         int counter = 0;
         int j = 0;
+        int hex = 0;
         for (int i = 0; i < MAX_LINE_SIZE; i++)
             {
-                if (isdigit(line[i]))
+                if (line[i] == '.')
                     {
+                        i += 4;
+                        continue;
+                    }
+                if (isalnum(line[i]))
+                    {
+                        if (line[i] == '0' && line[i+1] == 'x')
+                            hex = 1;
                         temp_var[j] = line[i];
                         if (isspace(line[i+1]))
                             {
                                 if (counter == 0)
                                     {
-                                        line_loc = atoi(temp_var);
+                                        if (hex == 1) line_loc = extend_sign(strtoul(temp_var, NULL, 16));
+                                        else line_loc = atoi(temp_var);
                                         j = 0;
                                         counter++;
                                         continue;
@@ -109,7 +130,7 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list,
         Label *label;
         char temp_str[4];
         char temp_char[0];
-        for (int i = 0; i < MAX_LINE_SIZE; i++)
+        for (int i = 0; i < strlen(line); i++)
             {
                 if (line[i] == ':') return; // skip label line
                 else if (counter == 4 && isalpha(line[i])) // translate label
