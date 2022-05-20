@@ -6,8 +6,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "instruction.h"
+//#include "io.h"
 
 #define ZERO_REG 0
+#define CLKS_REG 8
 #define SP_REG 14
 
 #define INST_SIZE 12
@@ -38,11 +40,12 @@
 
 
 void write_regout(FILE* fp_regout, int* reg);
-void run_instructions(Instruction* instructions, int* reg, int* ioreg, int clk_cycle, FILE* fp_trace);
+void run_instructions(Instruction* instructions, int regs[NUM_REGS], int* ioreg, FILE* fp_trace, char memory[][LINE_MAX_SIZE]);
+int decode_inst(int pc, int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MAX_SIZE]);
 void close_pf(FILE** file_pointers[], int argc);
 void print_reg_state(int pc, int* reg, Instruction* inst);
 void write_cycles(FILE* fp_cycles, int cycles);
-void write_trace(FILE* fp_trace, int pc, Instruction* inst, int* reg);
-void get_instructions(FILE* fp_memin, Instruction* head);
+void write_trace(FILE* fp_trace, int pc, Instruction* inst, int* regs);
+void get_instructions(FILE* fp_memin, Instruction* head, char memory[][LINE_MAX_SIZE]);
 
 #endif

@@ -1,9 +1,15 @@
 #include "simulator.h"
 #define _CRT_SECURE_NO_WARNINGS
+
+
+//int main(int argc, char* argv[])
+//{
+//    return 0;
+//}
+
 int main(int argc, char* argv[])
 {
 
-    int clk_cycle = 0; //! Supposed to be part of the ioreg and wehre the fuck the stack pointer is set to?
 
     FILE* fp_memin = NULL, * fp_diskin = NULL, * fp_irq2in = NULL, * fp_memout = NULL,
         * fp_regout = NULL, * fp_trace = NULL, * fp_hwregtrace = NULL, * fp_cycles = NULL, * fp_leds = NULL, * fp_display7seg = NULL,
@@ -11,9 +17,15 @@ int main(int argc, char* argv[])
 
     FILE** file_pointers[] = { NULL, &fp_memin, &fp_diskin, &fp_irq2in, &fp_memout,
                               &fp_regout, &fp_trace, &fp_hwregtrace, &fp_cycles, &fp_leds, &fp_display7seg, &fp_diskout, &fp_monitor_txt, &fp_monitor_yuv };
+    
+    //int irq2[200] = add_irq2(fp_irq2in);
+    int is_in_task = 0;
+    //check_interrupts(int ioreg[], int* pc, int is_task, int irq2[]);
+    // when calling to reti set to zero
+
     const int output_file_index = 4; // All file after this inex are output files
-    int reg[NUM_REGS] = { 0 }, ioreg[NUM_IOREGS] = { 0 };
-    reg[SP_REG] = MAX_LINES;
+    int regs[NUM_REGS] = { 0 }, ioreg[NUM_IOREGS] = { 0 };
+    regs[SP_REG] = MAX_LINES;
 
     Instruction* instructions = instructionNewinstruction(-1, -1, -1, -1, -1, -1); // initiation the head of the linked list.
     char memory[MAX_LINES][LINE_MAX_SIZE];
@@ -54,9 +66,9 @@ int main(int argc, char* argv[])
         }
     }
     get_instructions(fp_memin, instructions, memory);
-    run_instructions(instructions, reg, ioreg, clk_cycle, fp_trace);
+    run_instructions(instructions, regs, ioreg, fp_trace, memory);
     write_cycles(fp_cycles, cycles);
-    write_regout(fp_regout, reg);
+    write_regout(fp_regout, regs);
     instructionDeleteList(instructions);
     close_pf(file_pointers, argc);
     return 0;
@@ -71,9 +83,10 @@ void close_pf(FILE** file_pointers[], int argc)
 }
 
 //fetching the instructions and executing them
-void run_instructions(Instruction* instructions, int* reg, int* ioreg, int clk_cycle, FILE* fp_trace)
+void run_instructions(Instruction* instructions, int regs[NUM_REGS], int* ioreg, FILE* fp_trace, char memory[][LINE_MAX_SIZE])
 {
-
+    
+    int clk_cycle; //This is wrong but its good for now
     int pc = 0;
     Instruction* current_instruction;
     // int irq = (irq0enable & irq0status) | (irq1enable & irq1status) | (irq2enable & irq2status);
@@ -83,10 +96,10 @@ void run_instructions(Instruction* instructions, int* reg, int* ioreg, int clk_c
         instructionPrintInstruction(current_instruction);
 
         // Write trace
-        write_trace(fp_trace, pc, current_instruction, reg);
+        write_trace(fp_trace, pc, current_instruction,regs);
         // execute the next instruction from the assembly
-        pc = decode_inst(pc, reg, ioreg, current_instruction, &clk_cycle);
-        print_reg_state(pc, reg, current_instruction);
+        pc = decode_inst(pc, regs, ioreg, current_instruction, memory);
+        print_reg_state(pc, regs, current_instruction);
      
     }
 
@@ -98,13 +111,13 @@ void print_reg_state(int pc, int* reg, Instruction* inst)
     const int reg_num = 16;
     char reg_name[][20] = { "zero", "imm", "v0", "a0", "a1", "a2", "a3", "t0", "t1", "t2", "s0", "s1", "s2", "gp", "sp", "ra" };
     // int R0 = reg[0], R1 = reg[1], R2 = reg[2], R3 = reg[3], R4 = reg[4], R5 = reg[5], R6 = reg[6], R7 = reg[7], R8 = reg[8], R9 = reg[9], R10 = reg[10], R11 = reg[11], R12 = reg[12], R13 = reg[13], R14 = reg[14], R15 = reg[15];
-    printf("PC:%03X ", pc);
+    printf("PC:%d ", pc);
     int i;
     for (i = 0; i < reg_num; i++)
     {
         if (i == inst->rd || i == inst->rs || i == inst->rt)
             printf("\033[031m");
-        printf("%s:%X  ", reg_name[i], reg[i]);
+        printf("%s:%d  ", reg_name[i], reg[i]);
         printf("\033[0m");
     }
     printf("\n\n");
@@ -124,26 +137,28 @@ void write_regout(FILE* fp_regout, int* reg)
     fprintf(fp_regout, "%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n", R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15);
 }
 
-void write_trace(FILE* fp_trace, int pc, Instruction* inst, int* reg)
+void write_trace(FILE* fp_trace, int pc, Instruction* inst, int* regs)
 {
-    int R0 = reg[0], R1 = reg[1], R2 = reg[2], R3 = reg[3], R4 = reg[4], R5 = reg[5], R6 = reg[6], R7 = reg[7], R8 = reg[8], R9 = reg[9], R10 = reg[10], R11 = reg[11], R12 = reg[12], R13 = reg[13], R14 = reg[14], R15 = reg[15];
+    int R0 = regs[0], R1 = regs[1], R2 = regs[2], R3 = regs[3], R4 = regs[4], R5 = regs[5], R6 = regs[6], R7 = regs[7], R8 = regs[8], R9 = regs[9], R10 = regs[10], R11 = regs[11], R12 = regs[12], R13 = regs[13], R14 = regs[14], R15 = regs[15];
     fprintf(fp_trace, "%03X %05X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X\n", pc, inst->opcode, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15);
 }
 // decoding the instruction and executing the correct operation.
-int decode_inst(int pc, int* reg, int* ioreg, Instruction* inst, int* cycle)
+int decode_inst(int pc, int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MAX_SIZE])
 {
+    char int_to_char[LINE_MAX_SIZE] = { '\0' };
+    int* cycle = &ioreg[CLKS_REG];
     int old_imm = inst->imm;
     int pc_adder = 1; // adding 1 or 2 according to the type of the instruction.
     int cycles_adder = 1;
     if (instructionType(inst) == I_TYPE)
     {
-        cycles_adder = 2;
-        reg[IMM_REG] = inst->imm;
+        cycles_adder = 2;  //! need to call guy's code
+        regs[IMM_REG] = inst->imm;
         pc_adder = 2;
     }
     else
     {
-        reg[IMM_REG] = 0;
+        regs[IMM_REG] = 0;
         old_imm = 0;
     }
     switch (inst->opcode)
@@ -154,7 +169,7 @@ int decode_inst(int pc, int* reg, int* ioreg, Instruction* inst, int* cycle)
         {
             break;
         }
-        reg[inst->rd] = reg[inst->rs] + reg[inst->rt];
+        regs[inst->rd] = regs[inst->rs] + regs[inst->rt];
 
         break;
     case 1: // sub
@@ -163,7 +178,7 @@ int decode_inst(int pc, int* reg, int* ioreg, Instruction* inst, int* cycle)
         {
             break;
         }
-        reg[inst->rd] = reg[inst->rs] - reg[inst->rt];
+        regs[inst->rd] = regs[inst->rs] - regs[inst->rt];
 
         break;
     case 2: // mul
@@ -172,7 +187,7 @@ int decode_inst(int pc, int* reg, int* ioreg, Instruction* inst, int* cycle)
         {
             break;
         }
-        reg[inst->rd] = reg[inst->rs] * reg[inst->rt];
+        regs[inst->rd] = regs[inst->rs] * regs[inst->rt];
         break;
     case 3: // and
         pc += pc_adder;
@@ -180,7 +195,7 @@ int decode_inst(int pc, int* reg, int* ioreg, Instruction* inst, int* cycle)
         {
             break;
         }
-        reg[inst->rd] = reg[inst->rs] & reg[inst->rt];
+        regs[inst->rd] = regs[inst->rs] & regs[inst->rt];
 
         break;
     case 4: // or
@@ -189,7 +204,7 @@ int decode_inst(int pc, int* reg, int* ioreg, Instruction* inst, int* cycle)
         {
             break;
         }
-        reg[inst->rd] = reg[inst->rs] | reg[inst->rt];
+        regs[inst->rd] = regs[inst->rs] | regs[inst->rt];
 
         break;
     case 5: // xor
@@ -198,7 +213,7 @@ int decode_inst(int pc, int* reg, int* ioreg, Instruction* inst, int* cycle)
         {
             break;
         }
-        reg[inst->rd] = reg[inst->rs] ^ reg[inst->rt];
+        regs[inst->rd] = regs[inst->rs] ^ regs[inst->rt];
         break;
     case 6: // sll
         pc += pc_adder;
@@ -206,7 +221,7 @@ int decode_inst(int pc, int* reg, int* ioreg, Instruction* inst, int* cycle)
         {
             break;
         }
-        reg[inst->rd] = reg[inst->rs] << reg[inst->rt];
+        regs[inst->rd] = regs[inst->rs] << regs[inst->rt];
 
         break;
     case 7: // sra
@@ -215,7 +230,7 @@ int decode_inst(int pc, int* reg, int* ioreg, Instruction* inst, int* cycle)
         {
             break;
         }
-        reg[inst->rd] = reg[inst->rs] >> reg[inst->rt];
+        regs[inst->rd] = regs[inst->rs] >> regs[inst->rt];
 
         break;
     case 8: // srl
@@ -224,53 +239,59 @@ int decode_inst(int pc, int* reg, int* ioreg, Instruction* inst, int* cycle)
         {
             break;
         }
-        reg[inst->rd] = ((unsigned int)reg[inst->rs]) >> reg[inst->rt];
+        regs[inst->rd] = ((unsigned int)regs[inst->rs]) >> regs[inst->rt];
         break;
     case 9: // beq
-        if (reg[inst->rs] == reg[inst->rt])
-            pc = reg[inst->rd];
+        if (regs[inst->rs] == regs[inst->rt])
+            pc = regs[inst->rd];
         else
             pc += pc_adder;
         break;
     case 10: // bne
-        if (reg[inst->rs] != reg[inst->rt])
-            pc = reg[inst->rd];
+        if (regs[inst->rs] != regs[inst->rt])
+            pc = regs[inst->rd];
         else
             pc += pc_adder;
         break;
     case 11: // blt
-        if (reg[inst->rs] < reg[inst->rt])
-            pc = reg[inst->rd];
+        if (regs[inst->rs] < regs[inst->rt])
+            pc = regs[inst->rd];
         else
             pc += pc_adder;
         break;
     case 12: // bgt
-        if (reg[inst->rs] > reg[inst->rt])
-            pc = reg[inst->rd];
+        if (regs[inst->rs] > regs[inst->rt])
+            pc = regs[inst->rd];
         else
             pc += pc_adder;
         break;
     case 13: // ble
-        if (reg[inst->rs] <= reg[inst->rt])
-            pc = reg[inst->rd];
+        if (regs[inst->rs] <= regs[inst->rt])
+            pc = regs[inst->rd];
         else
             pc += pc_adder;
         break;
     case 14: // bge
-        if (reg[inst->rs] >= reg[inst->rt])
-            pc = reg[inst->rd];
+        if (regs[inst->rs] >= regs[inst->rt])
+            pc = regs[inst->rd];
         else
             pc += pc_adder;
         break;
     case 15: // jal
         pc += pc_adder;
-        reg[inst->rd] = pc;
-        pc = reg[inst->rs];
+        regs[inst->rd] = pc;
+        pc = regs[inst->rs];
         break;
     case 16: // lw
+        pc += pc_adder;
+        printf("Loading data from line:    %d\n", regs[inst->rs] + regs[inst->rt]);
+        regs[inst->rd] = extend_sign(strtoul(memory[regs[inst->rs] + regs[inst->rt]], NULL, 16));
         cycles_adder = 3; //! need to call guy's code
         break;
     case 17: // sw
+        pc += pc_adder;
+        printf("saving data to line:    %d\n", regs[inst->rs] + regs[inst->rt]);
+        sprintf(memory[regs[inst->rs] + regs[inst->rt]], "%05X", regs[inst->rd]);
         cycles_adder = 3; //! need to call guy's code
         break;
     case 18: // reti
@@ -285,33 +306,33 @@ int decode_inst(int pc, int* reg, int* ioreg, Instruction* inst, int* cycle)
     default:
         pc = -1;
     }
-    reg[IMM_REG] = old_imm;
-    reg[ZERO_REG] = 0;
+    regs[IMM_REG] = old_imm;
+    regs[ZERO_REG] = 0;
     *cycle = *cycle + cycles_adder;
     return pc;
 }
 // writing the memin into the memory array, and creating the instration linked list.
-void get_instructions(FILE* fp_memin, Instruction* head, char memory[MAX_LINES][LINE_SIZE])
+void get_instructions(FILE* fp_memin, Instruction* head, char memory[][LINE_MAX_SIZE])
 {
     int pc = 0;
     int next_pc = 0;
-    char cuurent_inst[LINE_MAX_SIZE];
+    char curent_inst[LINE_MAX_SIZE];
     char imm_line[LINE_MAX_SIZE];
-    while (fgets(cuurent_inst, LINE_MAX_SIZE, fp_memin))
+    while (fgets(curent_inst, LINE_MAX_SIZE, fp_memin))
     {
         pc = next_pc;
-        cuurent_inst[strcspn(cuurent_inst, "\r\n")] = '\0'; // remove \n and \r
+        curent_inst[strcspn(curent_inst, "\r\n")] = '\0'; // remove \n and \r
         
-        strcpy(memory[pc], cuurent_inst);
+        strcpy(memory[next_pc], curent_inst);
         next_pc++;
-        if (instructionTypeFromLine(cuurent_inst) == I_TYPE)
+        if (instructionTypeFromLine(curent_inst) == I_TYPE)
         {
             fgets(imm_line, LINE_MAX_SIZE, fp_memin);
             imm_line[strcspn(imm_line, "\r\n")] = '\0'; // remove \n and \r
-            strcpy(memory[pc], imm_line);
+            strcpy(memory[next_pc], imm_line);
             next_pc++;
             
         }
-        instructionAppendFromLine(head, cuurent_inst, imm_line, pc);
+        instructionAppendFromLine(head, curent_inst, imm_line, pc);
     }
 }

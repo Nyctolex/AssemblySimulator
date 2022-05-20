@@ -258,8 +258,6 @@ char* int_to_reg(int reg)
     return reg_srt;
 }
 
-
-
 void instructionPrintInstruction(Instruction* inst)
 {
 
