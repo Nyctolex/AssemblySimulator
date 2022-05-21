@@ -6,11 +6,20 @@
 //{
 //    return 0;
 //}
+int binom(int n,int k)
+{
+    if (k == 0 || n == k)
+    {
+        printf("\nk=%d  n=%d\n", k, n);
+        return 1;
+    }
+    return binom(n - 1, k - 1) + binom(n - 1, k);
+}
 
 int main(int argc, char* argv[])
 {
 
-
+    printf("binom : %d\n", binom(4, 2));
     FILE* fp_memin = NULL, * fp_diskin = NULL, * fp_irq2in = NULL, * fp_memout = NULL,
         * fp_regout = NULL, * fp_trace = NULL, * fp_hwregtrace = NULL, * fp_cycles = NULL, * fp_leds = NULL, * fp_display7seg = NULL,
         * fp_diskout = NULL, * fp_monitor_txt = NULL, * fp_monitor_yuv;
@@ -67,6 +76,7 @@ int main(int argc, char* argv[])
         }
     }
     add_irq2(fp_irq2in, irq2);
+    //get_instructions(fp_memin, instructions, memory);
     read_memory(fp_memin, memory);
     run_instructions(regs, ioreg, fp_trace, memory, &is_in_task, irq2);
     write_cycles(fp_cycles, cycles);
@@ -151,6 +161,10 @@ void write_trace(FILE* fp_trace, int pc, Instruction* inst, int* regs)
 // decoding the instruction and executing the correct operation.
 void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MAX_SIZE], int* pc_pointer, int* is_task, int irq2[])
 {
+    if (inst->rd == V0_REG) {
+        printf("\033[32m");
+        printf("k:  %d\n  %d\n", regs[A1_REG], regs[A0_REG]);
+    }
     char int_to_char[LINE_MAX_SIZE] = { '\0' };
     int* cycle = &ioreg[CLKS_REG];
     int old_imm = inst->imm;
@@ -355,14 +369,13 @@ void get_instructions(FILE* fp_memin, Instruction* head, char memory[][LINE_MAX_
         pc = next_pc;
         curent_inst[strcspn(curent_inst, "\r\n")] = '\0'; // remove \n and \r
         
-        strcpy(memory[next_pc], curent_inst);
-        //printf("%s\n", curent_inst);
+
+        printf("%s\n", curent_inst);
         next_pc++;
         if (instructionTypeFromLine(curent_inst) == I_TYPE)
         {
             fgets(imm_line, LINE_MAX_SIZE, fp_memin);
             imm_line[strcspn(imm_line, "\r\n")] = '\0'; // remove \n and \r
-            strcpy(memory[next_pc], imm_line);
             //printf("%s\n", imm_line);
             next_pc++;
             
