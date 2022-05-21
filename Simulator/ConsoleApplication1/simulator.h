@@ -11,6 +11,9 @@
 #define ZERO_REG 0
 #define CLKS_REG 8
 #define SP_REG 14
+#define V0_REG 2
+#define A0_REG 3
+#define A1_REG 4
 
 #define INST_SIZE 12
 
