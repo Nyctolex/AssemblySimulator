@@ -27,6 +27,7 @@ void instructionAppendData(Instruction* head, int opcode, int rd, int rs, int rt
 void instructionAppendFromLine(Instruction* head, char* line, char* imm_line, int location);
 int slice_atoi_hex(char str[], int start, int end);
 void instructionPrintInstruction(Instruction* inst);
+Instruction* instructionFromLine(char* line, char* imm_line, int location);
 void instructionDeleteList(Instruction* head);
 int extend_sign(int num);
 

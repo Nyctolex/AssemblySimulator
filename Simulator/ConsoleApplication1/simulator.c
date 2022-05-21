@@ -67,8 +67,8 @@ int main(int argc, char* argv[])
         }
     }
     add_irq2(fp_irq2in, irq2);
-    get_instructions(fp_memin, instructions, memory);
-    run_instructions(instructions, regs, ioreg, fp_trace, memory, &is_in_task, irq2);
+    read_memory(fp_memin, memory);
+    run_instructions(regs, ioreg, fp_trace, memory, &is_in_task, irq2);
     write_cycles(fp_cycles, cycles);
     write_regout(fp_regout, regs);
     instructionDeleteList(instructions);
@@ -85,7 +85,7 @@ void close_pf(FILE** file_pointers[], int argc)
 }
 
 //fetching the instructions and executing them
-void run_instructions(Instruction* instructions, int regs[NUM_REGS], int* ioreg, FILE* fp_trace, char memory[][LINE_MAX_SIZE], int* is_task, int irq2[])
+void run_instructions(int regs[NUM_REGS], int* ioreg, FILE* fp_trace, char memory[][LINE_MAX_SIZE], int* is_task, int irq2[])
 {
     
     int clk_cycle; //This is wrong but its good for now
@@ -94,8 +94,10 @@ void run_instructions(Instruction* instructions, int regs[NUM_REGS], int* ioreg,
     Instruction* current_instruction;
     while (pc != -1)
     {
+
         check_interrupts(ioreg, pc_pointer, is_task, irq2);
-        current_instruction = instructionGetByLocation(instructions, pc);
+        //current_instruction = instructionGetByLocation(instructions, pc);
+        current_instruction = get_instruction(pc, memory);
         instructionPrintInstruction(current_instruction);
 
         // Write trace
@@ -138,7 +140,7 @@ void write_cycles(FILE* fp_cycles, int cycles)
 void write_regout(FILE* fp_regout, int* reg)
 {
     int R0 = reg[0], R1 = reg[1], R2 = reg[2], R3 = reg[3], R4 = reg[4], R5 = reg[5], R6 = reg[6], R7 = reg[7], R8 = reg[8], R9 = reg[9], R10 = reg[10], R11 = reg[11], R12 = reg[12], R13 = reg[13], R14 = reg[14], R15 = reg[15];
-    fprintf(fp_regout, "%08d\n%08d\n%08d\n%08d\n%08d\n%08d\n%08d\n%08d\n%08d\n%08d\n%08d\n%08d\n%08d\n%08d\n", R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15);
+    fprintf(fp_regout, "%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n", R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15);
 }
 
 void write_trace(FILE* fp_trace, int pc, Instruction* inst, int* regs)
@@ -288,7 +290,10 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
         break;
     case 16: // lw
         *pc_pointer += pc_adder;
-        printf("Loading data from line:    %d\n", regs[inst->rs] + regs[inst->rt]);
+        //int loc = regs[inst->rs] + regs[inst->rt];
+        //printf("Loading data from line:    %d\n", loc);
+        //printf("the value for lines are:\n  %s\n    %s\n    %s\n", memory[loc - 1], memory[loc], memory[loc + 1]);
+        
         regs[inst->rd] = extend_sign(strtoul(memory[regs[inst->rs] + regs[inst->rt]], NULL, 16));
         cycles_adder = 3; //! need to call guy's code
         break;
@@ -315,6 +320,30 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
     *cycle = *cycle + cycles_adder;
 }
 // writing the memin into the memory array, and creating the instration linked list.
+
+void read_memory(FILE* fp_memin, char memory[][LINE_MAX_SIZE])
+{
+    int pc = 0;
+    int next_pc = 0;
+    char curent_inst[LINE_MAX_SIZE];
+    char imm_line[LINE_MAX_SIZE];
+    while (fgets(curent_inst, LINE_MAX_SIZE, fp_memin))
+    {
+        pc = next_pc;
+        curent_inst[strcspn(curent_inst, "\r\n")] = '\0'; // remove \n and \r
+        strcpy(memory[next_pc], curent_inst);
+        next_pc++;
+        if (instructionTypeFromLine(curent_inst) == I_TYPE)
+        {
+            fgets(imm_line, LINE_MAX_SIZE, fp_memin);
+            imm_line[strcspn(imm_line, "\r\n")] = '\0'; // remove \n and \r
+            strcpy(memory[next_pc], imm_line);
+            next_pc++;
+
+        }
+    }
+}
+
 void get_instructions(FILE* fp_memin, Instruction* head, char memory[][LINE_MAX_SIZE])
 {
     int pc = 0;
@@ -327,15 +356,29 @@ void get_instructions(FILE* fp_memin, Instruction* head, char memory[][LINE_MAX_
         curent_inst[strcspn(curent_inst, "\r\n")] = '\0'; // remove \n and \r
         
         strcpy(memory[next_pc], curent_inst);
+        //printf("%s\n", curent_inst);
         next_pc++;
         if (instructionTypeFromLine(curent_inst) == I_TYPE)
         {
             fgets(imm_line, LINE_MAX_SIZE, fp_memin);
             imm_line[strcspn(imm_line, "\r\n")] = '\0'; // remove \n and \r
             strcpy(memory[next_pc], imm_line);
+            //printf("%s\n", imm_line);
             next_pc++;
             
         }
         instructionAppendFromLine(head, curent_inst, imm_line, pc);
+        
     }
+}
+
+Instruction* get_instruction(int pc, char memory[][LINE_MAX_SIZE])
+{
+    char *curent_inst = memory[pc];
+    char * imm_line  = memory[pc];
+    if (instructionTypeFromLine(curent_inst) == I_TYPE)
+    {
+        imm_line = memory[pc+1];
+    }
+    return instructionFromLine(curent_inst, imm_line, pc);
 }

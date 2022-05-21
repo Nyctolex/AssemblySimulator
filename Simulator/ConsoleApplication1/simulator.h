@@ -40,12 +40,14 @@
 
 
 void write_regout(FILE* fp_regout, int* reg);
-void run_instructions(Instruction* instructions, int regs[NUM_REGS], int* ioreg, FILE* fp_trace, char memory[][LINE_MAX_SIZE], int* is_task, int irq2[]);
+void run_instructions(int regs[NUM_REGS], int* ioreg, FILE* fp_trace, char memory[][LINE_MAX_SIZE], int* is_task, int irq2[]);
 void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MAX_SIZE], int* pc_pointer, int* is_task, int irq2[]);
 void close_pf(FILE** file_pointers[], int argc);
 void print_reg_state(int pc, int* reg, Instruction* inst);
 void write_cycles(FILE* fp_cycles, int cycles);
 void write_trace(FILE* fp_trace, int pc, Instruction* inst, int* regs);
 void get_instructions(FILE* fp_memin, Instruction* head, char memory[][LINE_MAX_SIZE]);
+Instruction* get_instruction(int pc, char memory[][LINE_MAX_SIZE]);
+void read_memory(FILE* fp_memin, char memory[][LINE_MAX_SIZE]);
 
 #endif

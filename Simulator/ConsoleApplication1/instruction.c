@@ -45,6 +45,7 @@ void instructionAppendNode(Instruction* head, Instruction* node)
 {
     Instruction* tail = instructionLast(head);
     tail->next = node;
+    instructionPrintInstruction(node);
 }
 
 int instructionType(Instruction* inst)
@@ -91,6 +92,21 @@ void instructionAppendFromLine(Instruction* head, char* line, char* imm_line, in
         imm = extend_sign(strtoul(imm_line, NULL, 16));
     }
     instructionAppendData(head, opcode, rd, rs, rt, imm, location);
+}
+
+Instruction* instructionFromLine(char* line, char* imm_line, int location)
+{
+    int rt = slice_atoi_hex(line, 4, 5);
+    int rs = slice_atoi_hex(line, 3, 4);
+    int rd = slice_atoi_hex(line, 2, 3);
+    int opcode = slice_atoi_hex(line, 0, 2);
+    int imm = 0;
+    if (instructionTypeFromLine(line) == I_TYPE)
+    {
+        imm = extend_sign(strtoul(imm_line, NULL, 16));
+    }
+    Instruction* new_inst = instructionNewinstruction(opcode, rd, rs, rt, imm, location);
+    return new_inst;
 }
 
 // slice hexadecimal stirng (str[start:end]), return as int
@@ -274,7 +290,7 @@ void instructionPrintInstruction(Instruction* inst)
     }
     else
     {
-        printf("Location: %d    DATA: %s %s %s %s    Imm:   %X\n", inst->location, opcode, rd, rs, rt, inst->imm);
+        printf("Location: %d    DATA: %s %s %s %s    Imm:   %d\n", inst->location, opcode, rd, rs, rt, inst->imm);
     }
     free(opcode);
     free(rd);
