@@ -70,11 +70,11 @@ for i, line in enumerate(lines):
     elif 'call' in line:
         if len(line.split(' ')) == 2:
             op, label = line.split(' ')
-            new_code += 'add sp, imm, sp, -4 #allocating memory in the stack\n'
-            new_code += 'sw ra, zero, sp, 0 #pushing ra to stack\n'
-            new_code += 'jal ra, imm, zero, {label} #calling function {label}\n'.format(label=label)
-            new_code += 'lw ra, zero, sp, 0 #poping ra from stack\n'
-            new_code += 'add sp, imm, sp, 4 #freeing memory in stack'
+            new_code +='add sp, imm, sp, -4 #allocating memory in the stack\n'
+            new_code += pre_line + 'sw ra, zero, sp, 0 #pushing ra to stack\n'
+            new_code += pre_line +  'jal ra, imm, zero, {label} #calling function {label}\n'.format(label=label)
+            new_code += pre_line +  'lw ra, zero, sp, 0 #poping ra from stack\n'
+            new_code += pre_line +  'add sp, imm, sp, 4 #freeing memory in stack'
             
         else:
             arg_error(i+1)
@@ -84,7 +84,7 @@ for i, line in enumerate(lines):
             op, rs = line.split(' ')
             comment = ""
             new_code += 'add sp, imm, sp, -4 #allocating memory in the stack\n'
-            new_code += 'sw {rs}, zero, sp, 0 #pushing {rs} to stack ,{comment}'.format(rs=rs,comment=raw_comment)
+            new_code +=  pre_line + 'sw {rs}, zero, sp, 0 #pushing {rs} to stack ,{comment}'.format(rs=rs,comment=raw_comment)
             comment = "\n"
         else:
             arg_error(i+1)
@@ -93,7 +93,7 @@ for i, line in enumerate(lines):
         if len(line.split(' ')) == 2:
             op, rs = line.split(' ')
             new_code += 'lw {rs}, zero, sp, 0 #poping {rs} from stack, {comment}\n'.format(rs=rs, comment=raw_comment)
-            new_code += 'add sp, imm, sp, 4 #freeing memory in stack'
+            new_code +=  pre_line + 'add sp, imm, sp, 4 #freeing memory in stack'
             comment = "\n"
         else:
             arg_error(i+1)
