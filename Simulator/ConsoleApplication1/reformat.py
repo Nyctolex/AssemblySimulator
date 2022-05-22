@@ -31,13 +31,14 @@ new_code = ''
 for i, line in enumerate(lines):
     if '#' in line:
         commented_line = True
-        line, comment = line.split('#')
+        line, comment = line.split('#', 1)
         raw_comment = (comment + '.')[:-1]
         comment = ' # ' + comment + '\n'
     else:
         commented_line = False
         comment = '\n'
-    line = line.rstrip()
+        raw_comment = ""
+    line = line.rstrip().lstrip()
     #print(line)
     if line == '' or line == ' ' or ".word" in line:
         new_code += line+'\n'
@@ -68,7 +69,12 @@ for i, line in enumerate(lines):
     elif 'call' in line:
         if len(line.split(' ')) == 2:
             op, label = line.split(' ')
-            new_code += 'jal ra, imm, zero, {label}'.format(label=label)
+            new_code += 'add sp, imm, sp, -4 #allocating memory in the stack\n'
+            new_code += 'sw ra, zero, sp, 0 #pushing ra to stack\n'
+            new_code += 'jal ra, imm, zero, {label} #calling function {label}\n'.format(label=label)
+            new_code += 'lw ra, zero, sp, 0 #poping ra from stack\n'
+            new_code += 'add sp, imm, sp, 4 #freeing memory in stack'
+            
         else:
             arg_error(i+1)
             break
