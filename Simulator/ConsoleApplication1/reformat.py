@@ -134,10 +134,8 @@ for i, line in enumerate(lines):
     if '#' in line:
         line, comment = line.split('#', 1)
         comment = comment.lstrip()
-        print(comment)
         if len(line) < max_comment_start:
             tab = generate_white_space(max_comment_start - len(line))
-            print(len(tab))
             line += tab
         new_code += line +"#" + comment + "\n"
     else:
