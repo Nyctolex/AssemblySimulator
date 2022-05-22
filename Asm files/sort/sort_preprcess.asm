@@ -13,18 +13,18 @@ WHILE_NOT_SORTED:
     mov a0 s2
     set t0 0 #t0 = counter = 0
 FOR:
-    add t2, a0, t0,0 # t2 = baseAdress+index
-    lw s0, t2, zero, 0 #s0=MEM[baseAdress+index]
-    lw s1, t2, imm, 1 #s1=MEM[baseAdress+index+1]
-    ble imm, s0, s1,  FOR_CONDITION #if s0 <= s1 there is no need to swap
+        add t2, a0, t0,0 # t2 = baseAdress+index
+        lw s0, t2, zero, 0 #s0=MEM[baseAdress+index]
+        lw s1, t2, imm, 1 #s1=MEM[baseAdress+index+1]
+        ble imm, s0, s1,  FOR_CONDITION #if s0 <= s1 there is no need to swap
 NOT_SORTED:
-    push a0
-    mov a0 t2 # a0 = baseAdress+index
-    call SWAP
-    pop a0
+        push a0
+        mov a0 t2 # a0 = baseAdress+index
+        call SWAP
+        pop a0
 FOR_CONDITION:
-    add t0, t0, imm, 1 #counter++
-    blt imm, t0, t1, FOR # if counter < length, countue the for loop
+        add t0, t0, imm, 1 #counter++
+        blt imm, t0, t1, FOR # if counter < length, countue the for loop
 WHILE_CONDITION:
     mov a0 s2
     call IS_SORTED
@@ -38,13 +38,13 @@ set t0 0 #t0 = counter = 0
 set v0 1 # return value is true by default
 set t1 15 #t1 = length - 1 #t1 = length - 1 !!!!!!!!!!!!!!!!!
 LOOP:
-    add t2, a0, t0,0 # t2 = baseAdress+index
-    lw s0, t2, zero, 0 #s0=MEM[baseAdress+index]
-    lw s1, t2, imm, 1 #s1=MEM[baseAdress+index+1]
-    bgt imm, s0, s1,  RETURN0
-    add t0, t0, imm, 1 #counter++
-    bge imm, t0, t1, RETURN1
-    jmp LOOP
+        add t2, a0, t0,0 # t2 = baseAdress+index
+        lw s0, t2, zero, 0 #s0=MEM[baseAdress+index]
+        lw s1, t2, imm, 1 #s1=MEM[baseAdress+index+1]
+        bgt imm, s0, s1,  RETURN0
+        add t0, t0, imm, 1 #counter++
+        bge imm, t0, t1, RETURN1
+        jmp LOOP
 RETURN1:
     pop s1
     pop s0
