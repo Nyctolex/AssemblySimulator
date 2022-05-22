@@ -56,6 +56,22 @@ for i, line in enumerate(lines):
         else:
             arg_error(i+1)
             break
+    elif 'ret' in line:
+        new_code += "jal zero, ra, zero, 0"
+    elif 'jmp' in line:
+        if len(line.split(' ')) == 2:
+            op, label = line.split(' ')
+            new_code += 'jal zero, imm, zero, {label}'.format(label=label)
+        else:
+            arg_error(i+1)
+            break
+    elif 'call' in line:
+        if len(line.split(' ')) == 2:
+            op, label = line.split(' ')
+            new_code += 'jal ra, imm, zero, {label}'.format(label=label)
+        else:
+            arg_error(i+1)
+            break
     elif 'push' in line:
         if len(line.split(' ')) == 2:
             op, rs = line.split(' ')
