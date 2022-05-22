@@ -22,13 +22,14 @@ with open('test.asm', 'r') as f:
 if not 'halt' in code:
     print_error_messgae("no halt in code")
 old_code = (code + '.')[:-1] #coping code string
-code = remove_double_chars(code, ' ')
 code = remove_double_chars(code, '#')
 lines = code.split('\n')
 new_code = ''
 
 
 for i, line in enumerate(lines):
+    pre_line = line[:len(line) - len(line.lstrip())]
+    line = remove_double_chars(line, ' ')
     if '#' in line:
         commented_line = True
         line, comment = line.split('#', 1)
@@ -39,7 +40,7 @@ for i, line in enumerate(lines):
         comment = '\n'
         raw_comment = ""
     line = line.rstrip().lstrip()
-    #print(line)
+    new_code += pre_line
     if line == '' or line == ' ' or ".word" in line:
         new_code += line+'\n'
         continue
@@ -103,13 +104,47 @@ for i, line in enumerate(lines):
     else:
         new_code += line
     
+    
     new_code += comment
+
 
 code = new_code
 for reg in regs:
     code = code.replace(reg, "$"+reg)
 code = code.replace("$$", "$")
 
+new_code = ""
+def generate_white_space(num):
+    genereted = ""
+    for i in range(num):
+        genereted += " "
+    return genereted
+
+#reformatting comments
+#getting max length
+lines = code.split('\n')
+max_comment_start = 0
+for i, line in enumerate(lines):
+    if '#' in line:
+        line, comment = line.split('#', 1)
+        max_comment_start = max(len(line), max_comment_start)
+max_comment_start += 5
+#reformating
+for i, line in enumerate(lines):
+    if '#' in line:
+        line, comment = line.split('#', 1)
+        comment = comment.lstrip()
+        print(comment)
+        if len(line) < max_comment_start:
+            tab = generate_white_space(max_comment_start - len(line))
+            print(len(tab))
+            line += tab
+        new_code += line +"#" + comment + "\n"
+    else:
+        new_code += line + "\n"
+
+
+code = new_code
 if error_accured:
     code = old_code
 with open('test.asm', 'w') as f:
