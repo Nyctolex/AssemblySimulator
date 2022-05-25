@@ -29,13 +29,13 @@ CALC_KP:
     and s0, s0, imm, 0x00FF #s0 = Ax
     and s1, s1, imm, 0x00FF #s1 = Px
     sub s0, s1, s0, 0 #s0=Px-Ax = KP
-    push s0 #save KP
 CALC_AB:
     lw s0, imm, zero, 0x100 #s0 = Point A
     lw s1, imm, zero, 0x101 #s1 = Point B
     sra s0, s0, imm, 8 #s0 = Ay
     sra s1, s1, imm, 8 #s1 = By
     sub s0, s1, s0, 0 #s0 = By-Ay = AB 
+    push s0 #save KP
 SAVE_KP_MUL_AB:
     pop s1 #s1 = KP
     mul s0, s0, s1, 0 #s0 = AB*KP
@@ -43,11 +43,14 @@ LOAD_AK_MUL_BC:
     pop s1 #s1 = Ak*BC
     bge imm, s1, s0, RETURN_TRUE #if Ak*BC>= AB*KP return True
 RETUN_FALSE:
-    pop s0
-    pop s1
     pop s2
+    pop s1
+    pop s0
     ret #return False
 RETURN_TRUE:
+    pop s2
+    pop s1
+    pop s0
     set v0 1 #set v0 to true
     ret #return true
 .word 0x100 1797
