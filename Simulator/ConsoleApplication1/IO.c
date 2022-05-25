@@ -15,7 +15,7 @@ int irq(int ioreg[], int* pc, int is_task)
         pc = ioreg[6]; // pc = irqhandler
         is_task = 1;
     }
-void check_interrupts(int ioreg[], int* pc, int* is_task, int irq2[])
+void IO_handler(int ioreg[], int monitor_arr[], char disk_memory[][MAX_DISK_LINE_LEN], int* pc, int* is_task, int irq2[])
     {
         if (ioreg[11] == 1) // if the timer is enabled
             timer(ioreg); // update processor time
@@ -31,6 +31,7 @@ void check_interrupts(int ioreg[], int* pc, int* is_task, int irq2[])
         if (is_task != 1)
             if ((ioreg[0] && ioreg[3]) || (ioreg[1] && ioreg[4]) || (ioreg[2] && ioreg[5]))
                 irq(ioreg, pc, is_task);
+        monitor(monitor_arr, ioreg);
     }
 
 void add_irq2(FILE* irq2in, int* irq2)
