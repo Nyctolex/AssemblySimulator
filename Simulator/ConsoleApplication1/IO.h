@@ -9,6 +9,32 @@
 # define MAX_DISK_LINE 10
 # define SECTOR_AMOUNT 128
 # define SECTOR_SIZE 128
+# define LINES_MAX 4096 // ! make sure
+# define LINES_MAX_SIZE 10 // ! make sure
+// Registers
+    # define irq0enable 0
+    # define irq1enable 1
+    # define irq2enable 2
+    # define irq0status 3
+    # define irq1status 4
+    # define irq2status 5
+    # define irqhandler 6
+    # define irqreturn 7
+    # define clks 8
+    # define leds 9
+    # define display7seg 10
+    # define timerenable 11
+    # define timercurrent 12
+    # define timermax 13
+    # define diskcmd 14
+    # define disksector 15
+    # define diskbuffer 16
+    # define diskstatus 17
+    # define reserved 18
+    # define reserved 19
+    # define monitoraddr 20
+    # define monitordata 21
+    # define monitorcmd 22
 
 int timer(int ioreg[]);
 int irq(int ioreg[], int* pc, int is_task);
