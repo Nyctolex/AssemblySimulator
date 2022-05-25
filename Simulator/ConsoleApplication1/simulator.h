@@ -27,8 +27,7 @@
 #define MAX_LINES 4096
 #define NUM_SECTORS 128
 #define NUM_SECTOR_LINES 128
-#define MAX_DISK_LINE_LEN  10
-#define SECTOR_SIZE 512
+#define MAX_DISK_LINE_LEN 10
 #define LINE_MAX_SIZE 10
 
 #define NUM_COMMANDLINE_PARAMETERS 14
@@ -67,9 +66,6 @@ Instruction* read_instruction(int pc, char memory[][LINE_MAX_SIZE]);
 void write_memout(FILE* fp_memout, char memory[][LINE_MAX_SIZE]);
 void write_monitor_txt(FILE* fp_monitor_txt, int monitor[MONITOR_SIZE * MONITOR_SIZE]);
 void write_monitor_yuv(FILE* fp_monitor_yuv, int monitor[MONITOR_SIZE * MONITOR_SIZE]);
-
-
 void next_cycle(int* ioreg, int* pc_pointer, int* is_in_task, int irq2[]);
-
-#define next_clk next_cycle(ioreg, pc_pointer, is_in_task, irq2)
+#define next_clk next_cycle(ioreg, monitor, disk_memory, pc_pointer, is_in_task, irq2)
 #endif

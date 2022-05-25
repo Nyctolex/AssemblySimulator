@@ -3,8 +3,6 @@
 
 int main(int argc, char* argv[])
 {
-
-
     FILE* fp_memin = NULL, * fp_diskin = NULL, * fp_irq2in = NULL, * fp_memout = NULL,
         * fp_regout = NULL, * fp_trace = NULL, * fp_hwregtrace = NULL, * fp_cycles = NULL, * fp_leds = NULL, * fp_display7seg = NULL,
         * fp_diskout = NULL, * fp_monitor_txt = NULL, * fp_monitor_yuv;
@@ -74,7 +72,7 @@ int main(int argc, char* argv[])
     //get_instructions(fp_memin, instructions, memory);
     read_memory(fp_memin, memory);
     read_disk_memory(fp_diskin, disk_memory);
-    run_instructions(regs, ioreg, fp_trace, memory, &is_in_task, irq2);
+    run_instructions(regs, ioreg, fp_trace, memory, &is_in_task, irq2,monitor ,disk_memory);
     write_cycles(fp_cycles, ioreg[CLK_REG]);
     write_regout(fp_regout, regs);
     write_memout(fp_memout, memory);
@@ -95,9 +93,9 @@ void close_pf(FILE** file_pointers[], int argc)
     }
 }
 
-void next_cycle( int* ioreg, int* pc_pointer,int* is_in_task, int irq2[]) {
+void next_cycle( int* ioreg, int monitor[], char disk_memory[][MAX_DISK_LINE_LEN], int* pc_pointer, int* is_in_task, int irq2[]) {
     ioreg[CLK_REG] ++;
-    check_interrupts(ioreg, pc_pointer, is_in_task, irq2);
+    IO_handler(ioreg, monitor, disk_memory, pc_pointer, is_in_task, irq2);
 
 }
 
@@ -258,7 +256,7 @@ void get_instructions(FILE* fp_memin, Instruction* head, char memory[][LINE_MAX_
     }
 }
 
-void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MAX_SIZE], int* pc_pointer, int* is_in_task, int irq2[])
+void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MAX_SIZE], int* pc_pointer, int* is_in_task, int irq2[], int monitor[], char disk_memory[][MAX_DISK_LINE_LEN])
 {
     //char int_to_char[LINE_MAX_SIZE] = { '\0' }; ------------------
     int old_imm = inst->imm;
@@ -434,9 +432,8 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
     regs[ZERO_REG] = 0;
 }
 
-void run_instructions(int regs[NUM_REGS], int* ioreg, FILE* fp_trace, char memory[][LINE_MAX_SIZE], int* is_in_task, int irq2[])
+void run_instructions(int regs[NUM_REGS], int* ioreg, FILE* fp_trace, char memory[][LINE_MAX_SIZE], int* is_in_task, int irq2[], int monitor[], char disk_memory[][MAX_DISK_LINE_LEN])
 {
-
     int clk_cycle; //This is wrong but its good for now
     int pc = 0;
     int* pc_pointer = &pc;
@@ -453,7 +450,7 @@ void run_instructions(int regs[NUM_REGS], int* ioreg, FILE* fp_trace, char memor
         write_trace(fp_trace, pc, current_instruction, regs);
 
         // execute the next instruction from the assembly
-        decode_inst(regs, ioreg, current_instruction, memory, pc_pointer, is_in_task, irq2);
+        decode_inst(regs, ioreg, current_instruction, memory, pc_pointer, is_in_task, irq2,monitor, disk_memory);
         print_reg_state(pc, regs, current_instruction);
 
     }
