@@ -1,4 +1,4 @@
-set a0 200 #a0 = baseadress
+set a0 0x100 #a0 = baseadress
 call SORT
 halt $zero, $zero, $zero, 0
 SORT:
@@ -64,19 +64,19 @@ SWAP:
     pop s1
     pop s0
     ret
-.word 200 3
-.word 201 4
-.word 202 2
-.word 203 5
-.word 204 1
-.word 205 6
-.word 206 8
-.word 207 9
-.word 208 7
-.word 209 10
-.word 210 16
-.word 211 15
-.word 212 14
-.word 213 11
-.word 214 13
-.word 215 12
+.word 0x100 3
+.word 0x101 4
+.word 0x102 2
+.word 0x103 5
+.word 0x104 1
+.word 0x105 6
+.word 0x106 8
+.word 0x107 9
+.word 0x108 7
+.word 0x109 10
+.word 0x10A 16
+.word 0x10B 15
+.word 0x10C 14
+.word 0x10D 11
+.word 0x10E 13
+.word 0x10F 12
