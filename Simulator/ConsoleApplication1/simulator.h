@@ -19,6 +19,7 @@
 #define CLK_REG 8
 
 #define INST_SIZE 12
+#define MONITOR_SIZE 256
 
 #define LINE_SIZE 5
 #define NUM_REGS 16
@@ -64,6 +65,8 @@ void read_memory(FILE* fp_memin, char memory[][LINE_MAX_SIZE]);
 void get_instructions(FILE* fp_memin, Instruction* head, char memory[][LINE_MAX_SIZE]);
 Instruction* read_instruction(int pc, char memory[][LINE_MAX_SIZE]);
 void write_memout(FILE* fp_memout, char memory[][LINE_MAX_SIZE]);
+void write_monitor_txt(FILE* fp_monitor_txt, int monitor[MONITOR_SIZE * MONITOR_SIZE]);
+void write_monitor_yuv(FILE* fp_monitor_yuv, int monitor[MONITOR_SIZE * MONITOR_SIZE]);
 
 
 void next_cycle(int* ioreg, int* pc_pointer, int* is_in_task, int irq2[]);

@@ -25,12 +25,13 @@ int main(int argc, char* argv[])
     reset_memory(memory);
     char disk_memory[NUM_SECTORS* NUM_SECTOR_LINES][MAX_DISK_LINE_LEN];
     reset_disk_memory(disk_memory);
+    int monitor[MONITOR_SIZE * MONITOR_SIZE] = { 0 };
     int pc = 0, irq = 0, busy_with_interruption = 0;
 
-    int argc2 = NUM_COMMANDLINE_PARAMETERS; //temporary only
-    char argv2[NUM_COMMANDLINE_PARAMETERS][500 + 1] = { "", "memin.txt", "diskin.txt", "irq2in.txt", "memout.txt", "regout.txt", "trace.txt", "hwregtrace.txt", "cycles.txt", "leds.txt", "display7seg.txt", "diskout.txt", "monitor.txt", "monitor.yuv" };
+    //int argc2 = NUM_COMMANDLINE_PARAMETERS; //temporary only
+    //char argv2[NUM_COMMANDLINE_PARAMETERS][500 + 1] = { "", "memin.txt", "diskin.txt", "irq2in.txt", "memout.txt", "regout.txt", "trace.txt", "hwregtrace.txt", "cycles.txt", "leds.txt", "display7seg.txt", "diskout.txt", "monitor.txt", "monitor.yuv" };
 
-    if (argc2 != NUM_COMMANDLINE_PARAMETERS) // check command line arguments
+    if (argc != NUM_COMMANDLINE_PARAMETERS) // check command line arguments
     {
         printf("Error: Incorrect command line arguments number\n");
         return 1;
@@ -41,24 +42,31 @@ int main(int argc, char* argv[])
     for (i = 1; i < output_file_index; i++)
     {
 
-        *file_pointers[i] = fopen(argv2[i], "r");
+        *file_pointers[i] = fopen(argv[i], "r");
 
         if (*(file_pointers[i]) == NULL)
         {
-            printf("Error: The file %s couldn't open properly", argv2[i]);
+            printf("Error: The file %s couldn't open properly", argv[i]);
             return -1;
         }
     }
-    // opening the output files
-    for (i = i; i < argc2; i++)
+    // opening the output files without yuv file
+    for (i = i; i < argc - 1; i++)
     {
 
-        *file_pointers[i] = fopen(argv2[i], "w");
+        *file_pointers[i] = fopen(argv[i], "w");
         if (*(file_pointers[i]) == NULL)
         {
-            printf("Error: The file %s couldn't open properly", argv2[i]);
+            printf("Error: The file %s couldn't open properly", argv[i]);
             return -1;
         }
+    }
+    //open yuv in binary
+    *file_pointers[i] = fopen(argv[i], "wb");
+    if (*(file_pointers[i]) == NULL)
+    {
+        printf("Error: The file %s couldn't open properly", argv[i]);
+        return -1;
     }
 
 
@@ -71,6 +79,8 @@ int main(int argc, char* argv[])
     write_regout(fp_regout, regs);
     write_memout(fp_memout, memory);
     write_diskout(fp_diskout, disk_memory);
+    write_monitor_txt(fp_monitor_txt, monitor);
+    write_monitor_yuv(fp_monitor_yuv, monitor);
     //instructionDeleteList(instructions); //----------------------------------
     close_pf(file_pointers, argc);
     return 0;
@@ -197,6 +207,20 @@ void write_memout(FILE* fp_memout, char memory[][LINE_MAX_SIZE]) {
     }
 }
 
+void write_monitor_txt(FILE* fp_monitor_txt, int monitor[MONITOR_SIZE* MONITOR_SIZE]) {
+    int i = 0;
+    for (i = 0; i < MONITOR_SIZE* MONITOR_SIZE; i++) {
+        fprintf(fp_monitor_txt, "%02X\n", monitor[i]);
+    }
+}
+
+void write_monitor_yuv(FILE* fp_monitor_yuv, int monitor[MONITOR_SIZE * MONITOR_SIZE]) {
+    int i = 0;
+    for (i = 0; i < MONITOR_SIZE * MONITOR_SIZE; i++) {
+        fprintf(fp_monitor_yuv, "%u", monitor[i]);
+    }
+}
+
 void write_diskout(FILE* fp_diskout, char disk_memory[][MAX_DISK_LINE_LEN]) {
     int i = 0;
     int line;
@@ -206,7 +230,6 @@ void write_diskout(FILE* fp_diskout, char disk_memory[][MAX_DISK_LINE_LEN]) {
     }
 }
 // decoding the instruction and executing the correct operation.
-
 
 //-------------------------------------------
 void get_instructions(FILE* fp_memin, Instruction* head, char memory[][LINE_MAX_SIZE])

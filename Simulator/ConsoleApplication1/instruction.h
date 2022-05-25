@@ -16,7 +16,7 @@ typedef struct _instruction
 #define R_TYPE 0
 #define I_TYPE 1
 #define LINE_MAX_SIZE 10
-
+Instruction* instructionFromLine(char* line, char* imm_line, int location);
 Instruction* instructionNewinstruction(int opcode, int rd, int rs, int rt, int imm, int location);
 Instruction* instructionGetByLocation(Instruction* head, int location);
 Instruction* instructionLast(Instruction* head);
@@ -27,7 +27,7 @@ void instructionAppendData(Instruction* head, int opcode, int rd, int rs, int rt
 void instructionAppendFromLine(Instruction* head, char* line, char* imm_line, int location);
 int slice_atoi_hex(char str[], int start, int end);
 void instructionPrintInstruction(Instruction* inst);
-Instruction* instructionFromLine(char* line, char* imm_line, int location);
+
 void instructionDeleteList(Instruction* head);
 int extend_sign(int num);
 
