@@ -15,7 +15,7 @@ int irq(int ioreg[], int* pc, int is_task)
         pc = ioreg[6]; // pc = irqhandler
         is_task = 1;
     }
-void IO_handler(int ioreg[], int monitor_arr[], char disk_memory[][MAX_DISK_LINE_LEN], int* pc, int* is_task, int irq2[])
+void IO_handler(int ioreg[], int monitor_arr[], char disk_memory[][MAX_DISK_LINE], int* pc, int* is_task, int irq2[])
     {
         if (ioreg[11] == 1) // if the timer is enabled
             timer(ioreg); // update processor time
