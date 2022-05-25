@@ -24,6 +24,7 @@ int main(int argc, char* argv[])
     char disk_memory[NUM_SECTORS* NUM_SECTOR_LINES][MAX_DISK_LINE_LEN];
     reset_disk_memory(disk_memory);
     int monitor[MONITOR_SIZE * MONITOR_SIZE] = { 0 };
+    write_yuv(monitor);
     int pc = 0, irq = 0, busy_with_interruption = 0;
 
     //int argc2 = NUM_COMMANDLINE_PARAMETERS; //temporary only
@@ -214,8 +215,9 @@ void write_monitor_txt(FILE* fp_monitor_txt, int monitor[MONITOR_SIZE* MONITOR_S
 
 void write_monitor_yuv(FILE* fp_monitor_yuv, int monitor[MONITOR_SIZE * MONITOR_SIZE]) {
     int i = 0;
+    int chars[2];
     for (i = 0; i < MONITOR_SIZE * MONITOR_SIZE; i++) {
-        fprintf(fp_monitor_yuv, "%u", monitor[i]);
+        fprintf(fp_monitor_yuv, "%c", monitor[i]);
     }
 }
 
