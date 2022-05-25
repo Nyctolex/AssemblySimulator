@@ -127,13 +127,22 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list,
         int counter = 0;
         int len = 0;
         int hex;
+        int hex_num = 0;
         Label *label;
         char temp_str[6];
         char temp_char[2];
         for (int i = 0; i < strlen(line); i++)
             {
+                if ((line[i] == '0') && (line[i+1] == 'x'))
+                    {
+                        hex_num = 1;
+                        break;
+                    }
+            }
+        for (int i = 0; i < strlen(line); i++)
+            {
                 if (line[i] == ':') return; // skip label line
-                else if (counter == 4 && isalpha(line[i]) && !(line[i] == 'x' && line[i-1] == '0')) // translate label
+                else if (counter == 4 && isalpha(line[i]) && hex_num != 1) // translate label
                     {
                         for (int j=i; !isspace(line[j]); j++)
                             {
@@ -145,15 +154,17 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list,
                         add_to_memin_str(temp_str, memin_str, 5, 0);
                         return;
                     }
-                else if (line[i] == ',' || line[i] == '$' || line[i] == '#' || line[i] == '\n') // translate reg name
+                else if (line[i] == ',' || line[i] == '$' || line[i] == '#' || line[i] == '\n' || i == strlen(line)-1) // translate reg name
                     {
-                        if (var[0] == '0' && var[1] == 'x') // FIXME
+                        if (i == strlen(line)-1)
                             {
-                                // printf("%s %s %d %s\n", temp_str, var, strlen(var), line);
+                                var[len] = line[i];
+                                var[++len] = '\0';
+                            }
+                        if (var[0] == '0' && var[1] == 'x')
+                            {
                                 strcpy(temp_str, var+sizeof(char)*2);
-                                // printf("%s, %s\n", temp_str, var);
                                 int number = (int)strtoul(temp_str, NULL, 16);
-                                // printf("number: %d, var: %s\n", number, var);
                                 sprintf(temp_str, "%05X", number&0x000FFFFF);
                                 add_to_memin_str(temp_str, memin_str, 5, 0);
                                 return;
@@ -256,5 +267,4 @@ int main(int arg_amount, char *arg_vals[])
         remove zeros?
         add comments
         add header file
-        fix hex support (letters not working)
 */

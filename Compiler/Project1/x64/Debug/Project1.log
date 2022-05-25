@@ -1,5 +1,5 @@
 ﻿  Main.c
-C:\GitHub\AssemblySimulator\Compiler\Main.c(218,38): warning C4033: 'iter_lines' must return a value
+C:\GitHub\AssemblySimulator\Compiler\Main.c(229,38): warning C4033: 'iter_lines' must return a value
 C:\GitHub\AssemblySimulator\Compiler\Main.c(34): warning C4716: 'add_label': must return a value
-C:\GitHub\AssemblySimulator\Compiler\Main.c(224): warning C4716: 'iter_lines': must return a value
+C:\GitHub\AssemblySimulator\Compiler\Main.c(235): warning C4716: 'iter_lines': must return a value
   Project1.vcxproj -> C:\GitHub\AssemblySimulator\Compiler\Project1\x64\Debug\Project1.exe
