@@ -1,8 +1,8 @@
 # include <stdio.h>
 # include <string.h>
 # include <ctype.h>
-# include "Label.c"
-# include <dict.h>
+# include "Label.h"
+# include "dict.h "
 
 # define MAX_LINE_SIZE 501
 # define GET_LABEL 0
@@ -128,12 +128,12 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list,
         int len = 0;
         int hex;
         Label *label;
-        char temp_str[4];
-        char temp_char[0];
+        char temp_str[6];
+        char temp_char[2];
         for (int i = 0; i < strlen(line); i++)
             {
                 if (line[i] == ':') return; // skip label line
-                else if (counter == 4 && isalpha(line[i])) // translate label
+                else if (counter == 4 && isalpha(line[i]) && !(line[i] == 'x' && line[i-1] == '0')) // translate label
                     {
                         for (int j=i; !isspace(line[j]); j++)
                             {
@@ -147,7 +147,19 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list,
                     }
                 else if (line[i] == ',' || line[i] == '$' || line[i] == '#' || line[i] == '\n') // translate reg name
                     {
-                        if ((isdigit(var[0]) || (var[0] == '-')) && atoi(var) != 0) // translate imm num
+                        if (var[0] == '0' && var[1] == 'x') // FIXME
+                            {
+                                // printf("%s %s %d %s\n", temp_str, var, strlen(var), line);
+                                strcpy(temp_str, var+sizeof(char)*2);
+                                // printf("%s, %s\n", temp_str, var);
+                                int number = (int)strtoul(temp_str, NULL, 16);
+                                // printf("number: %d, var: %s\n", number, var);
+                                sprintf(temp_str, "%05X", number&0x000FFFFF);
+                                add_to_memin_str(temp_str, memin_str, 5, 0);
+                                return;
+
+                            }
+                        else if ((isdigit(var[0]) || (var[0] == '-')) && atoi(var) != 0) // translate imm num
                             {
                                 sprintf(temp_str, "%05X", atoi(var)&0x000FFFFF);
                                 add_to_memin_str(temp_str, memin_str, 5, 0);
@@ -203,6 +215,7 @@ int iter_lines(FILE *fp, char iter_type, Label *label_list, FILE *memin, char *m
         int line_loc = 0;
         while (fgets(line, MAX_LINE_SIZE, asm_file))
             {
+                if (line[0] == '\n') return;
                 if (iter_type == GET_LABEL) line_loc = search_label(line, line_index, line_loc, label_list);
                 else if (iter_type == TRANSLATE_ITER) translate_file(line, line_index, line_loc, label_list, memin, memin_str);
                 line_index++;
@@ -218,7 +231,7 @@ int main(int arg_amount, char *arg_vals[])
         FILE *asm_file = fopen(arg_vals[1], "r");
         if (asm_file)
             {
-                char memin_str[MAX_MEMIN_SIZE*6];
+                char memin_str[MAX_MEMIN_SIZE*6+1];
                 for (int i=0; i<MAX_MEMIN_SIZE*6; i++)
                     {
                         if (((i+1)%6) == 0) memin_str[i] = '\n';
@@ -234,8 +247,8 @@ int main(int arg_amount, char *arg_vals[])
                 write_to_file(memin_str, memin);
                 fclose(memin);
                 labelDeleteList(label_list);
+                fclose(asm_file);
             }
-        fclose(asm_file);
         return 0;
     }
 /*
@@ -243,4 +256,5 @@ int main(int arg_amount, char *arg_vals[])
         remove zeros?
         add comments
         add header file
+        fix hex support (letters not working)
 */

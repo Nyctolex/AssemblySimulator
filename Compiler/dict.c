@@ -1,46 +1,5 @@
 # include <string.h>
-// * Creating Strings
-    // * Registers
-        char zero[] = "zero";
-        char imm[] = "imm";
-        char v0[] = "v0";
-        char a0[] = "a0";
-        char a1[] = "a1";
-        char a2[] = "a2";
-        char a3[] = "a3";
-        char t0[] = "t0";
-        char t1[] = "t1";
-        char t2[] = "t2";
-        char s0[] = "s0";
-        char s1[] = "s1";
-        char s2[] = "s2";
-        char gp[] = "gp";
-        char sp[] = "sp";
-        char ra[] = "ra";
-    // * OpCodes
-        char word[] = ".word";
-        char add[] = "add";
-        char sub[] = "sub";
-        char mul[] = "mul";
-        char and[] = "and";
-        char or[] = "or";
-        char xor[] = "xor";
-        char sll[] = "sll";
-        char sra[] = "sra";
-        char srl[] = "srl";
-        char beq[] = "beq";
-        char bne[] = "bne";
-        char blt[] = "blt";
-        char bgt[] = "bgt";
-        char ble[] = "ble";
-        char bge[] = "bge";
-        char jal[] = "jal";
-        char lw[] = "lw";
-        char sw[] = "sw";
-        char reti[] = "reti";
-        char in[] = "in";
-        char out[] = "out";
-        char halt[] = "halt";
+# include "dict.h"
 // * Compare Strings
     int compare(char *exp) // returns the expression's opcode
         {
@@ -86,3 +45,6 @@
                 else if (!strcmp(exp, out)) return 20;
                 else if (!strcmp(exp, halt)) return 21;
         }
+/*
+    add dict.h
+*/
