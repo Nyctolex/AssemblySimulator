@@ -2,7 +2,7 @@
 # include <string.h>
 # include <ctype.h>
 # include "Label.h"
-# include "dict.h "
+# include "dict.h"
 
 # define MAX_LINE_SIZE 501
 # define GET_LABEL 0
@@ -21,7 +21,7 @@ int is_imm(char *line)
             }
         return FALSE;
     }
-int add_label(char *line, int line_loc, Label *label_list)
+void add_label(char *line, int line_loc, Label *label_list)
     {
         char label [MAX_LINE_SIZE] = "";
         int counter = 0;
@@ -129,7 +129,7 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list,
         int hex;
         int hex_num = 0;
         Label *label;
-        char temp_str[6];
+        char temp_str[7];
         char temp_char[2];
         for (int i = 0; i < strlen(line); i++)
             {
@@ -218,7 +218,7 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list,
             }
         return;
     }
-int iter_lines(FILE *fp, char iter_type, Label *label_list, FILE *memin, char *memin_str)
+void iter_lines(FILE *fp, char iter_type, Label *label_list, FILE *memin, char *memin_str)
     {
         FILE *asm_file = fp;
         char line [MAX_LINE_SIZE];

@@ -83,3 +83,11 @@ Simulator/ConsoleApplication1/AHK.ahk
 *.enc
 *.obj
 *.log
+*.pdb
+*.idb
+*.vsidx
+Compiler/Project1/.vs/Project1/v17/.suo
+*.db
+*.log
+*.opendb
+*.ipch
