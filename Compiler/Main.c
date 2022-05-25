@@ -168,7 +168,6 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list,
                                 sprintf(temp_str, "%05X", number&0x000FFFFF);
                                 add_to_memin_str(temp_str, memin_str, 5, 0);
                                 return;
-
                             }
                         else if ((isdigit(var[0]) || (var[0] == '-')) && atoi(var) != 0) // translate imm num
                             {
