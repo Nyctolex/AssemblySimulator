@@ -110,7 +110,8 @@ for i, line in enumerate(lines):
 
 code = new_code
 for reg in regs:
-    code = code.replace(reg, "$"+reg)
+    code = code.replace(' '+reg, ' '+"$"+reg)
+    code = code.replace(','+reg, ','+"$"+reg)
 code = code.replace("$$", "$")
 
 new_code = ""
