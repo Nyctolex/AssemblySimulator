@@ -2,34 +2,34 @@
 
 int timer(int ioreg[])
     {
-        if (++ioreg[12] == ioreg[13]) // check if the timer value is the maximal
+        if (++ioreg[timercurrent] == ioreg[timermax]) // check if the timer value is the maximal
         {
-            ioreg[3] = 1; // activate irqstatus0
-            ioreg[12] = 0; // zero timer_current
+            ioreg[irq0status] = 1; // activate irqstatus0
+            ioreg[timercurrent] = 0; // zero timer_current
         }
         return;
     }
 int irq(int ioreg[], int* pc, int is_task)
     {
-        ioreg[7] = pc; // pc = irqreturn
-        pc = ioreg[6]; // pc = irqhandler
+        ioreg[irqreturn] = pc;
+        pc = ioreg[irqhandler];
         is_task = 1;
     }
-void IO_handler(int ioreg[], int monitor_arr[], char disk_memory[][MAX_DISK_LINE], int* pc, int* is_task, int irq2[], int *disk_cycle, char memory[][LINES_MAX_SIZE], int *led, FILE *leds_file, FILE *display7seg_file)
+void IO_handler(int ioreg[], int monitor_arr[], char disk_memory[][MAX_DISK_LINE], int* pc, int* is_task, int irq2[], int *disk_cycle, char memory[LINES_MAX][LINES_MAX_SIZE], int *led, FILE *leds_file, FILE *display7seg_file)
     {
-        if (ioreg[11] == 1) // if the timer is enabled
+        if (ioreg[timerenable] == 1) // if the timer is enabled
             timer(ioreg); // update processor time
         for (int i = 0; irq2[i] != '\0'; i++)
-        {
-            ioreg[2] = 0;
-            if (irq2[i] == pc)
             {
-                ioreg[2] = 1;
-                break;
+                ioreg[irq2enable] = 0;
+                if (irq2[i] == pc)
+                    {
+                        ioreg[irq2enable] = 1;
+                        break;
+                    }
             }
-        }
         if (is_task != 1)
-            if ((ioreg[0] && ioreg[3]) || (ioreg[1] && ioreg[4]) || (ioreg[2] && ioreg[5]))
+            if ((ioreg[irq0enable] && ioreg[irq0status]) || (ioreg[irq1enable] && ioreg[irq1status]) || (ioreg[irq2enable] && ioreg[irq2status]))
                 irq(ioreg, pc, is_task);
         monitor(monitor_arr, ioreg);
         disk_command(ioreg, disk_memory, disk_cycle, memory);
@@ -42,17 +42,17 @@ void add_irq2(FILE* irq2in, int* irq2)
         char line[max_irq2_line];
         int i = 0;
         while (fgets(line, max_irq2_line, irq2in))
-        {
-            irq2[i++] = atoi(line);
-        }
+            {
+                irq2[i++] = atoi(line);
+            }
         irq2[i] = '-1';
     }
 void monitor(int monitor_arr[], int ioreg[])
     {
-        if (ioreg[22] == 1)
+        if (ioreg[monitorcmd] == 1)
             {
-                monitor_arr[ioreg[20]] = ioreg[21];
-                ioreg[22] = 0;
+                monitor_arr[ioreg[monitoraddr]] = ioreg[monitordata];
+                ioreg[monitorcmd] = 0;
             }
     }
 void disk_command(int ioreg[], char disk_memory[][MAX_DISK_LINE], int *disk_cycle, char memory[LINES_MAX][LINES_MAX_SIZE])
