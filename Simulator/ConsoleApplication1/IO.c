@@ -99,17 +99,14 @@ void disk_command(int ioreg[], char disk_memory[][MAX_DISK_LINE], int *disk_cycl
     }
 void led_write(int ioreg[], int *led, FILE *leds_file, int *pc)
     {
-        char line_str[] = {0};
         if (ioreg[leds] != led)
             {
                 led = ioreg[leds];
-                sprintf(line_str, "%d %08X\n", pc, led);
-                fputs(line_str, leds_file);
+                fprintf(leds_file, "%d %08X\n", pc, led)
             }
     }
 void hwregtrace_write(FILE *fp, int cycle, int read_write, int reg_num, int data)
     {
-        char line_str[] = {0};
         char action[6] = {0};
         char reg_name[5] = {0};
         if (read_write == 0) sprintf(action, "READ");
@@ -165,12 +162,9 @@ void hwregtrace_write(FILE *fp, int cycle, int read_write, int reg_num, int data
                     sprintf(reg_name, "ra");
                     break;
             }
-        sprintf(line_str, "%d %s %s %08X\n", cycle, action, reg_name, data);
-        fputs(line_str, fp);
+        fprintf(fp, "%d %s %s %08X\n", cycle, action, reg_name, data);
     }
 void display7seg_write(FILE *display7seg_file, int ioreg[], int *pc)
     {
-        char line_str[] = {0};
-        sprintf(line_str, "%d %08X", pc, ioreg[display7seg]);
-        fputs(line_str, display7seg_file);
+        fprintf(display7seg_file, "%d %08X\n", pc, ioreg[display7seg])
     }
