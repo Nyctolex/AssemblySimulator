@@ -8,6 +8,11 @@
 #include "instruction.h"
 #include "IO.h"
 
+#define FP_TRACE 5
+#define FP_HWREGTRACE 6
+#define FP_LED 8
+#define FP_DISPLAY7SEG 9
+
 #define ZERO_REG 0
 #define SP_REG 14
 #define V0_REG 2
@@ -17,6 +22,7 @@
 
 #define IRQRETURN_REG 7
 #define CLK_REG 8
+#define LEDS_REG 9
 
 #define INST_SIZE 12
 #define MONITOR_SIZE 256
@@ -61,11 +67,11 @@ void write_cycles(FILE* fp_cycles, int* cycles);
 void write_trace(FILE* fp_trace, int pc, Instruction* inst, int* regs);
 
 void read_memory(FILE* fp_memin, char memory[][LINE_MAX_SIZE]);
-void get_instructions(FILE* fp_memin, Instruction* head, char memory[][LINE_MAX_SIZE]);
+//void get_instructions(FILE* fp_memin, Instruction* head, char memory[][LINE_MAX_SIZE]);
 Instruction* read_instruction(int pc, char memory[][LINE_MAX_SIZE]);
 void write_memout(FILE* fp_memout, char memory[][LINE_MAX_SIZE]);
 void write_monitor_txt(FILE* fp_monitor_txt, int monitor[MONITOR_SIZE * MONITOR_SIZE]);
 void write_monitor_yuv(FILE* fp_monitor_yuv, int monitor[MONITOR_SIZE * MONITOR_SIZE]);
 void next_cycle(int* ioreg, int* pc_pointer, int* is_in_task, int irq2[]);
-#define next_clk next_cycle(ioreg, monitor, disk_memory, pc_pointer, is_in_task, irq2)
+#define next_clk next_cycle(ioreg, monitor, disk_memory, pc_pointer, is_in_task, irq2, memory, file_pointers, disk_cycle_ptr)
 #endif
