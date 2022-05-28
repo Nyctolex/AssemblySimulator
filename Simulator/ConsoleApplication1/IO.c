@@ -69,7 +69,7 @@ void disk_command(int ioreg[], char disk_memory[][MAX_DISK_LINE], int *disk_cycl
                                 for (int i=1000; i<LINES_MAX; i++) // for every memory line greater than 1000
                                     {
                                         is_full = 0;
-                                        for (int j=0; j<LINES_MAX_SIZE) // for every element in memory line
+                                        for (int j=0; j<LINES_MAX_SIZE; j++) // for every element in memory line
                                             {
                                                 if (memory[i][j] != 0) // check if an element is occupied
                                                     {
