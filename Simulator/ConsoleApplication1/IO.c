@@ -80,11 +80,11 @@ void disk_command(int ioreg[], char disk_memory[][MAX_DISK_LINE], int *disk_cycl
                                         if (is_full == 1) continue;
                                         else if (is_full == 1) line_index = i;
                                     }
-                                strcopy(memory[line_index], disk_memory[disksector*SECTOR_SIZE+diskbuffer]);
+                                strcpy(memory[line_index], disk_memory[disksector*SECTOR_SIZE+diskbuffer]);
                             }
                         else if (ioreg[diskcmd] == 2) // write sector
                             {
-                                strcopy(disk_memory[disksector*SECTOR_SIZE+diskbuffer], memory[line_index]);
+                                strcpy(disk_memory[disksector*SECTOR_SIZE+diskbuffer], memory[line_index]);
                             }
                     }
             }
