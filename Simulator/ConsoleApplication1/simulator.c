@@ -18,14 +18,12 @@ int main(int argc, char* argv[])
     const int output_file_index = 4; // All file after this inex are output files
     int regs[NUM_REGS] = { 0 }, ioreg[NUM_IOREGS] = { 0 };
     regs[SP_REG] = MAX_LINES;
-
     //Instruction* instructions = instructionNewinstruction(-1, -1, -1, -1, -1, -1); // initiation the head of the linked list.
     char memory[MAX_LINES][LINE_MAX_SIZE];
     reset_memory(memory);
     char disk_memory[NUM_SECTORS* NUM_SECTOR_LINES][MAX_DISK_LINE_LEN];
     reset_disk_memory(disk_memory);
     int monitor[MONITOR_SIZE * MONITOR_SIZE] = { 0 };
-    write_yuv(monitor);
     int pc = 0, irq = 0, busy_with_interruption = 0;
 
     //int argc2 = NUM_COMMANDLINE_PARAMETERS; //temporary only
@@ -98,8 +96,8 @@ void close_pf(FILE** file_pointers[], int argc)
 void next_cycle( int* ioreg, int monitor[], char disk_memory[][MAX_DISK_LINE_LEN], int* pc_pointer, int* is_in_task, int irq2[], char memory[][LINE_MAX_SIZE], FILE** file_pointers[], int* disk_cycle_ptr) {
     ioreg[CLK_REG] ++;
     int led = ioreg[LEDS_REG];
-    FILE* leds_file = *file_pointers[FP_LED];
-    FILE* display7seg_file = *file_pointers[FP_DISPLAY7SEG];
+    FILE* leds_file = *file_pointers[LEDS];
+    FILE* display7seg_file = *file_pointers[DISPLAY7SEG];
     IO_handler(ioreg, monitor, disk_memory, pc_pointer, is_in_task, irq2, disk_cycle_ptr, memory, led, leds_file, display7seg_file);
 
 }
@@ -186,7 +184,7 @@ void print_reg_state(int pc, int* reg, Instruction* inst)
 void write_cycles(FILE* fp_cycles, int* cycles)
 {
     int pc_adder = 1; // adding 1 or 2 according to the type of the instruction..
-    fprintf(fp_cycles, "%d", &cycles);
+    fprintf(fp_cycles, "%u", &cycles);
 }
 
 void write_regout(FILE* fp_regout, int* reg)
@@ -424,13 +422,13 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
             break;
         }
         regs[inst->rd] = ioreg[io_target_reg];
-        hwregtrace_write(*file_pointers[FP_HWREGTRACE], ioreg[CLK_REG], inst->opcode==20 , io_target_reg, ioreg[io_target_reg]);
+        hwregtrace_write(*file_pointers[HWREGTRACE], ioreg[CLK_REG], inst->opcode==20 , io_target_reg, ioreg[io_target_reg]);
         break;
     case 20: // out
         io_target_reg = regs[inst->rs] + regs[inst->rt];
         *pc_pointer += pc_adder;
         ioreg[io_target_reg] = regs[inst->rd];
-        hwregtrace_write(*file_pointers[FP_HWREGTRACE], ioreg[CLK_REG], inst->opcode == 20, io_target_reg, regs[inst->rd]);
+        hwregtrace_write(*file_pointers[HWREGTRACE], ioreg[CLK_REG], inst->opcode == 20, io_target_reg, regs[inst->rd]);
         break;
     case 21: // halt
         *pc_pointer = -1;
@@ -445,7 +443,7 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
 
 void run_instructions(int regs[NUM_REGS], int* ioreg, FILE** file_pointers[], char memory[][LINE_MAX_SIZE], int* is_in_task, int irq2[], int monitor[], char disk_memory[][MAX_DISK_LINE_LEN], int* disk_cycle_ptr)
 {
-    FILE* fp_trace = *file_pointers[FP_TRACE];
+    FILE* fp_trace = *file_pointers[TRACE];
     int clk_cycle; //This is wrong but its good for now
     int pc = 0;
     int* pc_pointer = &pc;

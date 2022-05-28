@@ -8,11 +8,6 @@
 #include "instruction.h"
 #include "IO.h"
 
-#define FP_TRACE 5
-#define FP_HWREGTRACE 6
-#define FP_LED 8
-#define FP_DISPLAY7SEG 9
-
 #define ZERO_REG 0
 #define SP_REG 14
 #define V0_REG 2
