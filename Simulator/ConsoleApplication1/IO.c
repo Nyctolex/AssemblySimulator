@@ -15,7 +15,7 @@ int irq(int ioreg[], int* pc, int is_task)
         pc = ioreg[irqhandler];
         is_task = 1;
     }
-void IO_handler(int ioreg[], int monitor_arr[], char disk_memory[][MAX_DISK_LINE], int* pc, int* is_task, int irq2[], int *disk_cycle, char memory[LINES_MAX][LINES_MAX_SIZE])
+void IO_handler(int ioreg[], int monitor_arr[], char disk_memory[][MAX_DISK_LINE], int* pc, int* is_task, int irq2[], int *disk_cycle, char memory[LINES_MAX][LINES_MAX_SIZE], int *led, FILE *leds_file)
     {
         if (ioreg[timerenable] == 1) // if the timer is enabled
             timer(ioreg); // update processor time
@@ -33,6 +33,7 @@ void IO_handler(int ioreg[], int monitor_arr[], char disk_memory[][MAX_DISK_LINE
                 irq(ioreg, pc, is_task);
         monitor(monitor_arr, ioreg);
         disk_command(ioreg, disk_memory, disk_cycle, memory);
+        led_write(ioreg, led, leds_file, pc);
     }
 
 void add_irq2(FILE* irq2in, int* irq2)
@@ -93,5 +94,13 @@ void disk_command(int ioreg[], char disk_memory[][MAX_DISK_LINE], int *disk_cycl
                 ioreg[diskstatus] = 0;
                 ioreg[irq1status] = 1;
                 disk_cycle--;
+            }
+    }
+void led_write(int ioreg[], int *led, FILE *leds_file, int *pc)
+    {
+        if (ioreg[leds] != led)
+            {
+                led = ioreg[leds];
+                fptus("%d %08X\n", pc, atoi(led));
             }
     }
