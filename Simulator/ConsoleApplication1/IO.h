@@ -9,8 +9,6 @@
 # define MAX_DISK_LINE 10
 # define SECTOR_AMOUNT 128
 # define SECTOR_SIZE 128
-<<<<<<< Updated upstream
-=======
 # define LINES_MAX 4096 // ! make sure
 # define LINES_MAX_SIZE 10 // ! make sure
 
@@ -54,7 +52,6 @@
     # define monitoraddr 20
     # define monitordata 21
     # define monitorcmd 22
->>>>>>> Stashed changes
 
 int timer(int ioreg[]);
 int irq(int ioreg[], int* pc, int is_task);

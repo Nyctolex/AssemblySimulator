@@ -52,8 +52,6 @@ void monitor(int monitor_arr[], int ioreg[])
                 ioreg[22] = 0;
             }
     }
-<<<<<<< Updated upstream
-=======
 void disk_command(int ioreg[], char disk_memory[][MAX_DISK_LINE], int *disk_cycle, char memory[LINES_MAX][LINES_MAX_SIZE])
     {
         int is_full = 0;
@@ -141,4 +139,3 @@ void display7seg_write(FILE *display7seg_file, int ioreg[], int *pc)
         sprintf(line_str, "%d %08X", pc, ioreg[display7seg]);
         fputs(line_str, display7seg_file);
     }
->>>>>>> Stashed changes
