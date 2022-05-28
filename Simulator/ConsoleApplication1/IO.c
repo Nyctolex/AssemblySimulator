@@ -102,7 +102,7 @@ void led_write(int ioreg[], int *led, FILE *leds_file, int *pc)
         if (ioreg[leds] != led)
             {
                 led = ioreg[leds];
-                fprintf(leds_file, "%d %08X\n", pc, led)
+                fprintf(leds_file, "%d %08X\n", pc, led);
             }
     }
 void hwregtrace_write(FILE *fp, int cycle, int read_write, int reg_num, int data)
@@ -166,5 +166,5 @@ void hwregtrace_write(FILE *fp, int cycle, int read_write, int reg_num, int data
     }
 void display7seg_write(FILE *display7seg_file, int ioreg[], int *pc)
     {
-        fprintf(display7seg_file, "%d %08X\n", pc, ioreg[display7seg])
+        fprintf(display7seg_file, "%d %08X\n", pc, ioreg[display7seg]);
     }
