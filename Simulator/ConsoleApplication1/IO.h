@@ -55,7 +55,7 @@
 
 int timer(int ioreg[]);
 int irq(int ioreg[], int* pc, int is_task);
-void IO_handler(int ioreg[], int monitor_arr[], char disk_memory[][MAX_DISK_LINE], int* pc, int* is_task, int irq2[]);
+void IO_handler(int ioreg[], int monitor_arr[], char disk_memory[][MAX_DISK_LINE], int* pc, int* is_task, int irq2[], int *disk_cycle, char memory[LINES_MAX][LINES_MAX_SIZE], int *led, FILE *leds_file, FILE *display7seg_file);
 void add_irq2(FILE* irq2in, int* irq2);
 void monitor(int monitor_arr[], int ioreg[]);
 void disk_command(int ioreg[], char disk_memory[][MAX_DISK_LINE], int *disk_cycle, char memory[LINES_MAX][LINES_MAX_SIZE]);
