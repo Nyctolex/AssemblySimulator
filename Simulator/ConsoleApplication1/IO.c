@@ -104,3 +104,32 @@ void led_write(int ioreg[], int *led, FILE *leds_file, int *pc)
                 fptus("%d %08X\n", pc, atoi(led));
             }
     }
+void hwregtrace_write(FILE *fp, int *pc, int read_write, int reg_num, int data)
+    {
+        char line_str[] = {0};
+        char action[6] = {0};
+        char reg_name[5] = {0};
+        if (read_write == 0) sprintf(action, "READ");
+        else if (read_write == 1) sprintf(action, "WRITE");
+        switch(reg_num)
+            {
+                case zero: sprintf(reg_name, "zero");
+                case imm: sprintf(reg_name, "imm");
+                case v0: sprintf(reg_name, "v0");
+                case a0: sprintf(reg_name, "a0");
+                case a1: sprintf(reg_name, "a1");
+                case a2: sprintf(reg_name, "a2");
+                case a3: sprintf(reg_name, "a3");
+                case t0: sprintf(reg_name, "t0");
+                case t1: sprintf(reg_name, "t1");
+                case t2: sprintf(reg_name, "t2");
+                case s0: sprintf(reg_name, "s0");
+                case s1: sprintf(reg_name, "s1");
+                case s2: sprintf(reg_name, "s2");
+                case gp: sprintf(reg_name, "gp");
+                case sp: sprintf(reg_name, "sp");
+                case ra: sprintf(reg_name, "ra");
+            }
+        sprintf(line_str, "%d %s %s %08X\n", pc, action, reg_name, data);
+        fputs(line_str, fp);
+    }

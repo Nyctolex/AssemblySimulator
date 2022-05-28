@@ -11,7 +11,23 @@
 # define SECTOR_SIZE 128
 # define LINES_MAX 4096 // ! make sure
 # define LINES_MAX_SIZE 10 // ! make sure
-// Registers
+    #define zero 0
+	#define imm  1
+	#define v0  2
+	#define a0  3
+	#define a1  4
+	#define a2  5
+	#define a3  6
+	#define t0  7
+	#define t1  8
+	#define t2  9
+	#define s0  10
+	#define s1  11
+	#define s2  12
+	#define gp  13
+	#define sp  14
+	#define ra  15
+// IORegisters
     # define irq0enable 0
     # define irq1enable 1
     # define irq2enable 2
