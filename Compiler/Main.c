@@ -266,4 +266,5 @@ int main(int arg_amount, char *arg_vals[])
         remove zeros?
         add comments
         add header file
+        add hex imm to .word
 */
