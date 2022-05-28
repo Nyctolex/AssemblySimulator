@@ -4,8 +4,8 @@ call BINOM #call binom
 sw v0, imm, zero, 0x102 #save output value to 0x102
 halt $zero, $zero, $zero, 0
 BINOM:
-    beq imm, a1, zero, RETUEN1 #if k== 0 -> return 1
-    beq imm, a0, a1, RETUEN1 #if k== n -> return 1
+    beq imm, a1, zero, RETURN1 #if k== 0 -> return 1
+    beq imm, a0, a1, RETURN1 #if k== n -> return 1
     push s0
     push s1
     mov s0 a0 #s0 = n
@@ -23,7 +23,7 @@ BINOM:
     pop s1
     pop s0
     ret #return
-RETUEN1:
+RETURN1:
     set v0 1
     ret #return
 .word 0x100 2

@@ -25,7 +25,7 @@ BINOM:
     add $sp, $imm, $sp, 4              #freeing memory in stack
     add $sp, $imm, $sp, -4             #allocating memory in the stack
     sw $v0, $zero, $sp, 0              #pushing $v0 to stack ,save the value of binom(n-1, k)
-    add $a0,, $s0, $zero, 0            #$a0 = n-1
+    add $a0, $s0, $zero, 0            #$a0 = n-1
     sub $s1, $s1, $imm, 1              #$s1=k-1
     add $a1, $s1, $zero, 0             #$a1 = $s1 = k-1
     add $sp, $imm, $sp, -4             #allocating memory in the stack

@@ -100,7 +100,7 @@ void close_pf(FILE** file_pointers[], int argc)
 }
 
 void next_cycle( int* ioreg, int monitor[], char disk_memory[][MAX_DISK_LINE_LEN], int* pc_pointer, int* is_in_task, int irq2[], char memory[][LINE_MAX_SIZE], FILE** file_pointers[], int* disk_cycle_ptr) {
-    ioreg[CLK_REG] ++; //update the value of the cycle counter
+    ioreg[CLK_REG] = ioreg[CLK_REG]%0xffffffff + 1; //update the value of the cycle counter
     int led = ioreg[LEDS_REG];
     FILE* leds_file = *file_pointers[LEDS];
     FILE* display7seg_file = *file_pointers[DISPLAY7SEG];
@@ -179,7 +179,7 @@ void print_reg_state(int pc, int* reg, Instruction* inst)
 
 void write_cycles(FILE* fp_cycles, int* cycles)
 {
-    fprintf(fp_cycles, "%u", &cycles);
+    fprintf(fp_cycles, "%u", cycles);
 }
 
 void write_regout(FILE* fp_regout, int* reg)
@@ -196,9 +196,10 @@ void write_trace(FILE* fp_trace, int pc, Instruction* inst, int* regs)
 
 void write_memout(FILE* fp_memout, char memory[][LINE_MAX_SIZE]) {
     int i = 0;
+    char line_str[6];
     int line;
     for (i = 0; i < MAX_LINES; i++) {
-        line = strtoul(memory[i], NULL, 16);
+        line = strtoul(memory[i], NULL, 16) & 0xFFFFF;
         fprintf(fp_memout, "%05X\n", line);
     }
 }
@@ -206,7 +207,7 @@ void write_memout(FILE* fp_memout, char memory[][LINE_MAX_SIZE]) {
 void write_monitor_txt(FILE* fp_monitor_txt, int monitor[MONITOR_SIZE* MONITOR_SIZE]) {
     int i = 0;
     for (i = 0; i < MONITOR_SIZE* MONITOR_SIZE; i++) {
-        fprintf(fp_monitor_txt, "%02X\n", monitor[i]);
+        fprintf(fp_monitor_txt, "%02X\n", monitor[i] & 0xFF);
     }
 }
 
@@ -223,7 +224,7 @@ void write_diskout(FILE* fp_diskout, char disk_memory[][MAX_DISK_LINE_LEN]) {
     int line;
     for (i = 0; i < NUM_SECTORS * NUM_SECTOR_LINES; i++) {
         line = strtoul(disk_memory[i], NULL, 16);
-        fprintf(fp_diskout, "%05X\n", line);
+        fprintf(fp_diskout, "%05X\n", line & 0x000FFFFF);
     }
 }
 
@@ -321,7 +322,13 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
         {
             break; //dont update target register's value
         }
-        regs[inst->rd] = (int)(((unsigned int)regs[inst->rs]) >> regs[inst->rt]);
+        if (regs[inst->rt] < 0){
+            regs[inst->rd] = (regs[inst->rs] >> regs[inst->rt]); // if its actualy a left shift
+        }
+        else
+        {
+            regs[inst->rd] = ( (regs[inst->rs] & 0x000FFFFF ) >> regs[inst->rt]); // get red of sign extentions
+        }
         break;
     case 9: // beq
         if (regs[inst->rs] == regs[inst->rt])
