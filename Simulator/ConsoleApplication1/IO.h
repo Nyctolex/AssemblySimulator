@@ -60,7 +60,7 @@ void add_irq2(FILE* irq2in, int* irq2);
 void monitor(int monitor_arr[], int ioreg[]);
 void disk_command(int ioreg[], char disk_memory[][MAX_DISK_LINE], int *disk_cycle, char memory[LINES_MAX][LINES_MAX_SIZE]);
 void led_write(int ioreg[], int *led, FILE *leds_file, int *pc);
-void hwregtrace_write(FILE *fp, int *pc, int read_write, int reg_num, int data);
+void hwregtrace_write(FILE *fp, int cycle, int read_write, int reg_num, int data);
 void display7seg_write(FILE *display7seg_file, int ioreg[], int *pc);
 
 # endif
