@@ -3,33 +3,36 @@
 
 int main(int argc, char* argv[])
 {
+    //allocating a pointer to each file we would use later
     FILE* fp_memin = NULL, * fp_diskin = NULL, * fp_irq2in = NULL, * fp_memout = NULL,
         * fp_regout = NULL, * fp_trace = NULL, * fp_hwregtrace = NULL, * fp_cycles = NULL, * fp_leds = NULL, * fp_display7seg = NULL,
         * fp_diskout = NULL, * fp_monitor_txt = NULL, * fp_monitor_yuv;
-
+    //an array of all file pointers
     FILE** file_pointers[] = { NULL, &fp_memin, &fp_diskin, &fp_irq2in, &fp_memout,
                               &fp_regout, &fp_trace, &fp_hwregtrace, &fp_cycles, &fp_leds, &fp_display7seg, &fp_diskout, &fp_monitor_txt, &fp_monitor_yuv };
     
+    //used for saving data for the irq2 handler
     int irq2[200];
     int disk_cycle = 0;
+    //used for saving data for the disk handler
     int* disk_cycle_ptr = &disk_cycle;
     int is_in_task = 0;
 
     const int output_file_index = 4; // All file after this inex are output files
+    // arrays which would represent the register of the proccessor and the io registers
     int regs[NUM_REGS] = { 0 }, ioreg[NUM_IOREGS] = { 0 };
+    //setting the value of the stack pointer to be at the end of the memory
     regs[SP_REG] = MAX_LINES;
-    //Instruction* instructions = instructionNewinstruction(-1, -1, -1, -1, -1, -1); // initiation the head of the linked list.
     char memory[MAX_LINES][LINE_MAX_SIZE];
+    //setting all lines to 000
     reset_memory(memory);
     char disk_memory[NUM_SECTORS* NUM_SECTOR_LINES][MAX_DISK_LINE_LEN];
+    //setting all lines to 000
     reset_disk_memory(disk_memory);
     int monitor[MONITOR_SIZE * MONITOR_SIZE] = { 0 };
     int pc = 0, irq = 0, busy_with_interruption = 0;
 
-    //int argc2 = NUM_COMMANDLINE_PARAMETERS; //temporary only
-    //char argv2[NUM_COMMANDLINE_PARAMETERS][500 + 1] = { "", "memin.txt", "diskin.txt", "irq2in.txt", "memout.txt", "regout.txt", "trace.txt", "hwregtrace.txt", "cycles.txt", "leds.txt", "display7seg.txt", "diskout.txt", "monitor.txt", "monitor.yuv" };
-
-    if (argc != NUM_COMMANDLINE_PARAMETERS) // check command line arguments
+    if (argc != NUM_COMMANDLINE_PARAMETERS) // check the number command line arguments
     {
         printf("Error: Incorrect command line arguments number\n");
         return 1;
@@ -67,19 +70,22 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-
+    //reading the fp_irq2in file to irq2 array
     add_irq2(fp_irq2in, irq2);
-    //get_instructions(fp_memin, instructions, memory);
+    //reading the memory from the input file into memory
     read_memory(fp_memin, memory);
+    //reading the memory from the input file into disk memory
     read_disk_memory(fp_diskin, disk_memory);
+    //run the instructions
     run_instructions(regs, ioreg, file_pointers, memory, &is_in_task, irq2,monitor ,disk_memory, disk_cycle_ptr);
+    //writing to the output files
     write_cycles(fp_cycles, ioreg[CLK_REG]);
     write_regout(fp_regout, regs);
     write_memout(fp_memout, memory);
     write_diskout(fp_diskout, disk_memory);
     write_monitor_txt(fp_monitor_txt, monitor);
     write_monitor_yuv(fp_monitor_yuv, monitor);
-    //instructionDeleteList(instructions); //----------------------------------
+    //close all opened files
     close_pf(file_pointers, argc);
     return 0;
 }
@@ -94,7 +100,7 @@ void close_pf(FILE** file_pointers[], int argc)
 }
 
 void next_cycle( int* ioreg, int monitor[], char disk_memory[][MAX_DISK_LINE_LEN], int* pc_pointer, int* is_in_task, int irq2[], char memory[][LINE_MAX_SIZE], FILE** file_pointers[], int* disk_cycle_ptr) {
-    ioreg[CLK_REG] ++;
+    ioreg[CLK_REG] ++; //update the value of the cycle counter
     int led = ioreg[LEDS_REG];
     FILE* leds_file = *file_pointers[LEDS];
     FILE* display7seg_file = *file_pointers[DISPLAY7SEG];
@@ -128,14 +134,6 @@ void read_memory(FILE* fp_memin, char memory[][LINE_MAX_SIZE])
         curent_inst[strcspn(curent_inst, "\r\n")] = '\0'; // remove \n and \r
         strcpy(memory[next_pc], curent_inst);
         next_pc++;
-        if (instructionTypeFromLine(curent_inst) == I_TYPE)
-        {
-            fgets(imm_line, LINE_MAX_SIZE, fp_memin);
-            imm_line[strcspn(imm_line, "\r\n")] = '\0'; // remove \n and \r
-            strcpy(memory[next_pc], imm_line);
-            next_pc++;
-
-        }
     }
 }
 
@@ -167,23 +165,20 @@ void print_reg_state(int pc, int* reg, Instruction* inst)
 {
     const int reg_num = 16;
     char reg_name[][20] = { "zero", "imm", "v0", "a0", "a1", "a2", "a3", "t0", "t1", "t2", "s0", "s1", "s2", "gp", "sp", "ra" };
-    // int R0 = reg[0], R1 = reg[1], R2 = reg[2], R3 = reg[3], R4 = reg[4], R5 = reg[5], R6 = reg[6], R7 = reg[7], R8 = reg[8], R9 = reg[9], R10 = reg[10], R11 = reg[11], R12 = reg[12], R13 = reg[13], R14 = reg[14], R15 = reg[15];
     printf("PC:%d ", pc);
     int i;
     for (i = 0; i < reg_num; i++)
     {
-        if (i == inst->rd || i == inst->rs || i == inst->rt)
+        if (i == inst->rd || i == inst->rs || i == inst->rt) // if the register is used in this instruction, print it in red
             printf("\033[031m");
         printf("%s:%d  ", reg_name[i], reg[i]);
-        printf("\033[0m");
+        printf("\033[0m"); //resum non color printing
     }
-    printf("\n\n");
-    // printf("PC:%03X Zero:%08X imm:%08X v0:%08X a0:%08X a1:%08X a2:%08X a3:%08X t0:%08X t1:%08X t2:%08X s0:%08X s1:%08X s2:%08X gp:%08X sp:%08X ra:%08X\n", pc, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15);
+    printf("\n");
 }
 
 void write_cycles(FILE* fp_cycles, int* cycles)
 {
-    int pc_adder = 1; // adding 1 or 2 according to the type of the instruction..
     fprintf(fp_cycles, "%u", &cycles);
 }
 
@@ -231,42 +226,12 @@ void write_diskout(FILE* fp_diskout, char disk_memory[][MAX_DISK_LINE_LEN]) {
         fprintf(fp_diskout, "%05X\n", line);
     }
 }
-// decoding the instruction and executing the correct operation.
-
-//-------------------------------------------
-//void get_instructions(FILE* fp_memin, Instruction* head, char memory[][LINE_MAX_SIZE])
-//{
-//    int pc = 0;
-//    int next_pc = 0;
-//    char curent_inst[LINE_MAX_SIZE];
-//    char imm_line[LINE_MAX_SIZE];
-//    while (fgets(curent_inst, LINE_MAX_SIZE, fp_memin))
-//    {
-//        pc = next_pc;
-//        curent_inst[strcspn(curent_inst, "\r\n")] = '\0'; // remove \n and \r
-//        
-//
-//        printf("%s\n", curent_inst);
-//        next_pc++;
-//        if (instructionTypeFromLine(curent_inst) == I_TYPE)
-//        {
-//            fgets(imm_line, LINE_MAX_SIZE, fp_memin);
-//            imm_line[strcspn(imm_line, "\r\n")] = '\0'; // remove \n and \r
-//            next_pc++;
-//            
-//        }
-//        instructionAppendFromLine(head, curent_inst, imm_line, pc);
-//        
-//    }
-//}
 
 void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MAX_SIZE], int* pc_pointer, int* is_in_task, int irq2[], int monitor[], char disk_memory[][MAX_DISK_LINE_LEN], FILE** file_pointers[], int* disk_cycle_ptr)
 {
-    //char int_to_char[LINE_MAX_SIZE] = { '\0' }; ------------------
     int io_target_reg;
     int old_imm = inst->imm;
     int pc_adder = 1; // adding 1 or 2 according to the type of the instruction.
-    //int cycles_adder = 1; ----------------------------
     if (instructionType(inst) == I_TYPE)
     {
         next_clk;
@@ -284,7 +249,7 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
         *pc_pointer += pc_adder;
         if (inst->rd <= IMM_REG) // wrting to REG0 or REG IMM
         {
-            break;
+            break; //dont update target register's value
         }
         regs[inst->rd] = regs[inst->rs] + regs[inst->rt];
 
@@ -293,7 +258,7 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
         *pc_pointer += pc_adder;
         if (inst->rd <= IMM_REG) // wrting to REG0 or REG IMM
         {
-            break;
+            break; //dont update target register's value
         }
         regs[inst->rd] = regs[inst->rs] - regs[inst->rt];
 
@@ -302,7 +267,7 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
         *pc_pointer += pc_adder;
         if (inst->rd <= IMM_REG) // wrting to REG0 or REG IMM
         {
-            break;
+            break; //dont update target register's value
         }
         regs[inst->rd] = regs[inst->rs] * regs[inst->rt];
         break;
@@ -310,7 +275,7 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
         *pc_pointer += pc_adder;
         if (inst->rd <= IMM_REG) // wrting to REG0 or REG IMM
         {
-            break;
+            break; //dont update target register's value
         }
         regs[inst->rd] = regs[inst->rs] & regs[inst->rt];
 
@@ -319,7 +284,7 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
         *pc_pointer += pc_adder;
         if (inst->rd <= IMM_REG) // wrting to REG0 or REG IMM
         {
-            break;
+            break; //dont update target register's value
         }
         regs[inst->rd] = regs[inst->rs] | regs[inst->rt];
 
@@ -328,7 +293,7 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
         *pc_pointer += pc_adder;
         if (inst->rd <= IMM_REG) // wrting to REG0 or REG IMM
         {
-            break;
+            break; //dont update target register's value
         }
         regs[inst->rd] = regs[inst->rs] ^ regs[inst->rt];
         break;
@@ -336,7 +301,7 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
         *pc_pointer += pc_adder;
         if (inst->rd <= IMM_REG) // wrting to REG0 or REG IMM
         {
-            break;
+            break; //dont update target register's value
         }
         regs[inst->rd] = regs[inst->rs] << regs[inst->rt];
 
@@ -345,7 +310,7 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
         *pc_pointer += pc_adder;
         if (inst->rd <= IMM_REG) // wrting to REG0 or REG IMM
         {
-            break;
+            break; //dont update target register's value
         }
         regs[inst->rd] = regs[inst->rs] >> regs[inst->rt];
 
@@ -354,7 +319,7 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
         *pc_pointer += pc_adder;
         if (inst->rd <= IMM_REG) // wrting to REG0 or REG IMM
         {
-            break;
+            break; //dont update target register's value
         }
         regs[inst->rd] = (int)(((unsigned int)regs[inst->rs]) >> regs[inst->rt]);
         break;
@@ -419,7 +384,7 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
         *pc_pointer += pc_adder;
         if (inst->rd <= IMM_REG) // wrting to REG0 or REG IMM
         {
-            break;
+            break; //dont update target register's value
         }
         regs[inst->rd] = ioreg[io_target_reg];
         hwregtrace_write(*file_pointers[HWREGTRACE], ioreg[CLK_REG], inst->opcode==20 , io_target_reg, ioreg[io_target_reg]);
@@ -444,24 +409,20 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
 void run_instructions(int regs[NUM_REGS], int* ioreg, FILE** file_pointers[], char memory[][LINE_MAX_SIZE], int* is_in_task, int irq2[], int monitor[], char disk_memory[][MAX_DISK_LINE_LEN], int* disk_cycle_ptr)
 {
     FILE* fp_trace = *file_pointers[TRACE];
-    int clk_cycle; //This is wrong but its good for now
     int pc = 0;
     int* pc_pointer = &pc;
     Instruction* current_instruction;
     while (pc != -1)
     {
-
         next_clk;
+        //fetch instruction from memory
         current_instruction = read_instruction(pc, memory);
-        //current_instruction = NULL;
-        instructionPrintInstruction(current_instruction);
-
+        //instructionPrintInstruction(current_instruction);
         // Write trace
         write_trace(fp_trace, pc, current_instruction, regs);
-
         // execute the next instruction from the assembly
         decode_inst(regs, ioreg, current_instruction, memory, pc_pointer, is_in_task, irq2,monitor, disk_memory, file_pointers, disk_cycle_ptr);
-        print_reg_state(pc, regs, current_instruction);
+        //print_reg_state(pc, regs, current_instruction);
 
     }
 
