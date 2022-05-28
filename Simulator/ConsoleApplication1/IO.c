@@ -103,7 +103,7 @@ void led_write(int ioreg[], int *led, FILE *leds_file, int *pc)
         if (ioreg[leds] != led)
             {
                 led = ioreg[leds];
-                sprintf(line_str, "%d %08X\n", pc, atoi(led));
+                sprintf(line_str, "%d %08X\n", pc, led);
                 fputs(line_str, leds_file);
             }
     }
