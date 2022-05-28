@@ -113,22 +113,54 @@ void hwregtrace_write(FILE *fp, int cycle, int read_write, int reg_num, int data
         else if (read_write == 1) sprintf(action, "WRITE");
         switch(reg_num)
             {
-                case zero_reg: sprintf(reg_name, "zero");
-                case imm_reg: sprintf(reg_name, "imm");
-                case v0_reg: sprintf(reg_name, "v0");
-                case a0_reg: sprintf(reg_name, "a0");
-                case a1_reg: sprintf(reg_name, "a1");
-                case a2_reg: sprintf(reg_name, "a2");
-                case a3_reg: sprintf(reg_name, "a3");
-                case t0_reg: sprintf(reg_name, "t0");
-                case t1_reg: sprintf(reg_name, "t1");
-                case t2_reg: sprintf(reg_name, "t2");
-                case s0_reg: sprintf(reg_name, "s0");
-                case s1_reg: sprintf(reg_name, "s1");
-                case s2_reg: sprintf(reg_name, "s2");
-                case gp_reg: sprintf(reg_name, "gp");
-                case sp_reg: sprintf(reg_name, "sp");
-                case ra_reg: sprintf(reg_name, "ra");
+                case zero_reg:
+                    sprintf(reg_name, "zero");
+                    break;
+                case imm_reg:
+                    sprintf(reg_name, "imm");
+                    break;
+                case v0_reg:
+                    sprintf(reg_name, "v0");
+                    break;
+                case a0_reg:
+                    sprintf(reg_name, "a0");
+                    break;
+                case a1_reg:
+                    sprintf(reg_name, "a1");
+                    break;
+                case a2_reg:
+                    sprintf(reg_name, "a2");
+                    break;
+                case a3_reg:
+                    sprintf(reg_name, "a3");
+                    break;
+                case t0_reg:
+                    sprintf(reg_name, "t0");
+                    break;
+                case t1_reg:
+                    sprintf(reg_name, "t1");
+                    break;
+                case t2_reg:
+                    sprintf(reg_name, "t2");
+                    break;
+                case s0_reg:
+                    sprintf(reg_name, "s0");
+                    break;
+                case s1_reg:
+                    sprintf(reg_name, "s1");
+                    break;
+                case s2_reg:
+                    sprintf(reg_name, "s2");
+                    break;
+                case gp_reg:
+                    sprintf(reg_name, "gp");
+                    break;
+                case sp_reg:
+                    sprintf(reg_name, "sp");
+                    break;
+                case ra_reg:
+                    sprintf(reg_name, "ra");
+                    break;
             }
         sprintf(line_str, "%d %s %s %08X\n", cycle, action, reg_name, data);
         fputs(line_str, fp);
