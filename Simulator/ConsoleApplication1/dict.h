@@ -1,7 +1,8 @@
 #pragma once 
 #ifndef _DICT_H
 #define _DICT_H
-
+#include <string.h>
+#define _CRT_SECURE_NO_WARNINGS
 #define zero "zero"
 #define imm_dict  "imm"
 #define v0  "v0"
@@ -42,10 +43,8 @@
 #define in  "in"
 #define out  "out"
 #define halt  "halt"
-
+/**
+ * @brief returns the expression's opcode
+ */
 int dict_compare(char* exp);
-char* int_to_opcode(int opcode);
-char* int_to_reg(int reg);
-
-
 #endif

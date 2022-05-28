@@ -1,6 +1,4 @@
 #include "instruction.h"
-//#include "dict.h"
-//#define _CRT_SECURE_NO_WARNINGS
 Instruction* instructionNewinstruction(int opcode, int rd, int rs, int rt, int imm, int location)
 {
     Instruction* new_instruction = (Instruction*)malloc(sizeof(Instruction));
@@ -19,12 +17,11 @@ Instruction* instructionNewinstruction(int opcode, int rd, int rs, int rt, int i
 
 Instruction* instructionGetByLocation(Instruction* head, int location)
 {
-    Instruction* temp = head;
-    while (temp->location != location)
+    Instruction* temp = head; //temporary node repersenting the current node checked.
+    while (temp->location != location) // while the current node is not the one we are searching for
     {
-
-        temp = temp->next;
-        if (temp == NULL)
+        temp = temp->next; //current node would set to the next node.
+        if (temp == NULL) //if we got to the last node of the lisr -> exit and return null
         {
             break;
         }
@@ -34,18 +31,18 @@ Instruction* instructionGetByLocation(Instruction* head, int location)
 
 Instruction* instructionLast(Instruction* head)
 {
-    Instruction* temp = head;
-    while (temp->next != NULL)
+    Instruction* temp = head; //temporary node repersenting the current node checked.
+    while (temp->next != NULL) //while it is not the last node
     {
-        temp = temp->next;
+        temp = temp->next;//current node would set to the next node.
     }
     return temp;
 }
+
 void instructionAppendNode(Instruction* head, Instruction* node)
 {
-    Instruction* tail = instructionLast(head);
-    tail->next = node;
-    instructionPrintInstruction(node);
+    Instruction* tail = instructionLast(head); //get the last node in the list
+    tail->next = node; //append the node
 }
 
 int instructionType(Instruction* inst)
@@ -59,6 +56,7 @@ int instructionType(Instruction* inst)
 
 int instructionTypeFromLine(char* line)
 {
+    //if one of the registers in the line is the immidiate register
     if ((slice_atoi_hex(line, 4, 5) == IMM_REG) || (slice_atoi_hex(line, 3, 4) == IMM_REG) || (slice_atoi_hex(line, 2, 3) == IMM_REG))
     {
         return I_TYPE;
@@ -66,45 +64,40 @@ int instructionTypeFromLine(char* line)
     return R_TYPE;
 }
 
-// void instructionInitFromLine(Instruction *inst, char *line, char *imm, int location)
-// {
-//     inst->rt = slice_atoi_hex(line, 4, 5);
-//     inst->rs = slice_atoi_hex(line, 3, 4);
-//     inst->rd = slice_atoi_hex(line, 2, 3);
-//     inst->opcode = slice_atoi_hex(line, 0, 2);
-// }
-
 void instructionAppendData(Instruction* head, int opcode, int rd, int rs, int rt, int imm, int location)
 {
+    //create a new instruction from the given parameters
     Instruction* new_tail = instructionNewinstruction(opcode, rd, rs, rt, imm, location);
+    //append the new node
     instructionAppendNode(head, new_tail);
 }
 
 void instructionAppendFromLine(Instruction* head, char* line, char* imm_line, int location)
 {
-    int rt = slice_atoi_hex(line, 4, 5);
-    int rs = slice_atoi_hex(line, 3, 4);
-    int rd = slice_atoi_hex(line, 2, 3);
-    int opcode = slice_atoi_hex(line, 0, 2);
+    int rt = slice_atoi_hex(line, 4, 5); //set rt to to its numeric value
+    int rs = slice_atoi_hex(line, 3, 4); //set rs to to its numeric value
+    int rd = slice_atoi_hex(line, 2, 3); //set rd to to its numeric value
+    int opcode = slice_atoi_hex(line, 0, 2); //set opcode to to its numeric value
     int imm = 0;
-    if (instructionTypeFromLine(line) == I_TYPE)
+    if (instructionTypeFromLine(line) == I_TYPE) // if the instruction is of I type
     {
-        imm = extend_sign(strtoul(imm_line, NULL, 16));
+        imm = extend_sign(strtoul(imm_line, NULL, 16)); //set imm to to its numeric value
     }
-    instructionAppendData(head, opcode, rd, rs, rt, imm, location);
+    instructionAppendData(head, opcode, rd, rs, rt, imm, location); //append the list with the new node
 }
 
 Instruction* instructionFromLine(char* line, char* imm_line, int location)
 {
-    int rt = slice_atoi_hex(line, 4, 5);
-    int rs = slice_atoi_hex(line, 3, 4);
-    int rd = slice_atoi_hex(line, 2, 3);
-    int opcode = slice_atoi_hex(line, 0, 2);
+    int rt = slice_atoi_hex(line, 4, 5);//set rt to to its numeric value
+    int rs = slice_atoi_hex(line, 3, 4);//set rs to to its numeric value
+    int rd = slice_atoi_hex(line, 2, 3);//set rd to to its numeric value
+    int opcode = slice_atoi_hex(line, 0, 2);//set opcode to to its numeric value
     int imm = 0;
-    if (instructionTypeFromLine(line) == I_TYPE)
+    if (instructionTypeFromLine(line) == I_TYPE)// if the instruction is of I type
     {
-        imm = extend_sign(strtoul(imm_line, NULL, 16));
+        imm = extend_sign(strtoul(imm_line, NULL, 16));//set imm to to its numeric value
     }
+    // create a new Instruction node with the given parameters taken from the line
     Instruction* new_inst = instructionNewinstruction(opcode, rd, rs, rt, imm, location);
     return new_inst;
 }
@@ -114,9 +107,9 @@ int slice_atoi_hex(char str[], int start, int end)
 {
     int len = end - start;
     char tmp[LINE_MAX_SIZE];
-    strncpy(tmp, str + start, len);
-    tmp[len] = '\0';
-    return strtoul(tmp, NULL, 16);
+    strncpy(tmp, str + start, len); //copy the wanted part of the line to tmp
+    tmp[len] = '\0'; //add null at the end of the string
+    return strtoul(tmp, NULL, 16); //return its numeric value
 }
 
 int extend_sign(int num)
@@ -131,7 +124,6 @@ int extend_sign(int num)
     }
     return num;
 }
-
 
 char* int_to_opcode(int opcode)
 {
@@ -307,15 +299,6 @@ void instructionPrintInstructionHex(Instruction* inst)
     else
     {
         printf("Location: %d    DATA: %X %X %X %X    Imm:   %X\n", inst->location, inst->opcode, inst->rd, inst->rs, inst->rt, inst->imm);
-    }
-}
-
-void instructionPrintInstructions(Instruction* head)
-{
-    while (head != NULL)
-    {
-        instructionPrintInstruction(head);
-        head = head->next;
     }
 }
 
