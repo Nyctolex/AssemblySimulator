@@ -45,6 +45,3 @@
                 else if (!strcmp(exp, out)) return 20;
                 else if (!strcmp(exp, halt)) return 21;
         }
-/*
-    add dict.h
-*/

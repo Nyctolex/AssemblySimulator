@@ -133,6 +133,7 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list,
         Label *label;
         char temp_str[7];
         char temp_char[2];
+        int not_imm = 0;
         for (int i = 0; i < strlen(line); i++)
             {
                 if ((line[i] == '0') && (line[i+1] == 'x'))
@@ -163,7 +164,7 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list,
                                 var[len] = line[i];
                                 var[++len] = '\0';
                             }
-                        if (var[0] == '0' && var[1] == 'x')
+                        if (var[0] == '0' && var[1] == 'x' && not_imm == 0)
                             {
                                 strcpy(temp_str, var+sizeof(char)*2);
                                 int number = (int)strtoul(temp_str, NULL, 16);
@@ -171,13 +172,13 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list,
                                 add_to_memin_str(temp_str, memin_str, 5, 0);
                                 return;
                             }
-                        else if ((isdigit(var[0]) || (var[0] == '-')) && atoi(var) != 0) // translate imm num
+                        else if ((isdigit(var[0]) || (var[0] == '-')) && atoi(var) != 0 && not_imm == 0) // translate imm num
                             {
                                 sprintf(temp_str, "%05X", atoi(var)&0x000FFFFF);
                                 add_to_memin_str(temp_str, memin_str, 5, 0);
                                 return;
                             }
-                        else if (is_imm(line) && atoi(var) == 0 && counter == 4) // translate 0 imm num
+                        else if (is_imm(line) && atoi(var) == 0 && counter == 4 && not_imm == 0) // translate 0 imm num
                             {
                                 sprintf(temp_str, "%05X", atoi(var));
                                 add_to_memin_str(temp_str, memin_str, 5, 0);
@@ -200,6 +201,7 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list,
                                             }
                                         else // reg
                                             {
+                                                if ((hex == 1) && (counter == 1)) not_imm = 1;
                                                 sprintf(temp_char, "%01X", hex);
                                                 add_to_memin_str(temp_char, memin_str, 1, counter);
                                             }
@@ -268,6 +270,4 @@ int main(int arg_amount, char *arg_vals[])
         remove zeros?
         add comments
         add header file
-        add hex imm to .word
-        fix cycles.txt
 */

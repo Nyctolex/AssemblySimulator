@@ -47,6 +47,6 @@
 		#define out  "out"
 		#define halt  "halt"
 
-	int compare(char* exp);
+	int compare(char* exp); // gets the string containing the reg's name and returns it's value
 # endif
 // ! add comments
