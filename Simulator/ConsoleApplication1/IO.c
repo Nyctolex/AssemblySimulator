@@ -107,6 +107,7 @@ void led_write(int ioreg[], int *led, FILE *leds_file, int *pc)
     }
 void hwregtrace_write(FILE *fp, int cycle, int read_write, int reg_num, int data)
     {
+        unsigned int data_unsigned = (unsigned) data;
         char action[6] = {0};
         char reg_name[5] = {0};
         if (read_write == 0) sprintf(action, "READ");
@@ -162,7 +163,7 @@ void hwregtrace_write(FILE *fp, int cycle, int read_write, int reg_num, int data
                     sprintf(reg_name, "ra");
                     break;
             }
-        fprintf(fp, "%d %s %s %08X\n", cycle, action, reg_name, data);
+        fprintf(fp, "%d %s %s %08X\n", cycle, action, reg_name, data_unsigned);
     }
 void display7seg_write(FILE *display7seg_file, int ioreg[], int *pc)
     {

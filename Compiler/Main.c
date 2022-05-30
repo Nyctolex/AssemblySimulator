@@ -102,12 +102,14 @@ void add_word(char *line, char *memin_str)
                                         else line_loc = atoi(temp_var);
                                         j = 0;
                                         counter++;
+                                        hex = 0;
                                         continue;
                                     }
                                 else if (counter == 1)
                                     {
                                         temp_var[j+1] = '\0';
-                                        sprintf(line_val, "%05X", atoi(temp_var));
+                                        if (hex == 1) sprintf(line_val, "%05X", extend_sign(strtoul(temp_var, NULL, 16)));
+                                        else sprintf(line_val, "%05X", atoi(temp_var));;
                                         break;
                                     }
                             }
@@ -267,4 +269,5 @@ int main(int arg_amount, char *arg_vals[])
         add comments
         add header file
         add hex imm to .word
+        fix cycles.txt
 */
