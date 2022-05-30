@@ -15,9 +15,16 @@ int memin_loc = 0;
 
 int is_imm(char *line)
     {
+        int counter = 0;
         for (int i = 0; i < MAX_LINE_SIZE; i++)
             {
-                if (line[i] == 'i' && line[i+1] == 'm' && line[i+2] == 'm') return TRUE;
+                if (i == 0)
+                    {
+                        if (isalpha(line[i])) counter++;
+                    }
+                else if (line[i] == '$' && isspace(line[i-1])) counter++;
+                if (line[i] == 'i' && line[i+1] == 'm' && line[i+2] == 'm' && counter != 2) return TRUE;
+                if (line[i] == 'i' && line[i+1] == 'm' && line[i+2] == 'm' && counter == 2) return FALSE;
             }
         return FALSE;
     }
@@ -108,10 +115,12 @@ void add_word(char *line, char *memin_str)
                                 else if (counter == 1)
                                     {
                                         temp_var[j+1] = '\0';
+                                        printf("%s %d", temp_var, j);
                                         if (hex == 1) sprintf(line_val, "%05X", extend_sign(strtoul(temp_var, NULL, 16)));
                                         else sprintf(line_val, "%05X", atoi(temp_var));;
                                         break;
                                     }
+                                printf("%d\n", j);
                             }
                         j++;
                     }
@@ -270,4 +279,9 @@ int main(int arg_amount, char *arg_vals[])
         remove zeros?
         add comments
         add header file
+        ! this:
+            add $t0, $imm, $imm, 3
+            add $imm, $zero, $imm, 3
+            .word 5 0x2
+            ! is printing 2E at line 6
 */
