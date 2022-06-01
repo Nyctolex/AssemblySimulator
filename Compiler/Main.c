@@ -23,8 +23,8 @@ int is_imm(char *line)
                         if (isalpha(line[i])) counter++;
                     }
                 else if (line[i] == '$' && isspace(line[i-1])) counter++;
-                if (line[i] == 'i' && line[i+1] == 'm' && line[i+2] == 'm' && counter != 2) return TRUE;
-                if (line[i] == 'i' && line[i+1] == 'm' && line[i+2] == 'm' && counter == 2) return FALSE;
+                if (line[i] == 'i' && line[i+1] == 'm' && line[i+2] == 'm' && counter != 1) return TRUE;
+                if (line[i] == 'i' && line[i+1] == 'm' && line[i+2] == 'm' && counter == 1) return FALSE;
             }
         return FALSE;
     }
@@ -115,7 +115,7 @@ void add_word(char *line, char *memin_str)
                                 else if (counter == 1)
                                     {
                                         temp_var[j+1] = '\0';
-                                        if (hex == 1) // sprintf(line_val, "%05X", extend_sign(strtoul(temp_var, NULL, 16)));
+                                        if (hex == 1)
                                             {
                                             for (int k = 2; k < 7; k++) line_val[k - 2] = temp_var[k];
                                             }
