@@ -142,6 +142,11 @@ char* int_to_reg(int reg);
 #define out  "out"
 #define halt  "halt"
 
+#define sw_opcode  17
+#define bge_opcode  14
+#define beq_opcode  9
+#define out_opcode  20
+
 
 
 

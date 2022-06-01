@@ -48,7 +48,7 @@ void instructionAppendNode(Instruction* head, Instruction* node)
 int instructionType(Instruction* inst)
 {
     
-    if ((inst->rd == IMM_REG) && ((beq_opcode <= inst->opcode  &&  inst->opcode <= bge_opcode) || inst->opcode==sw_opcode))
+    if ((inst->rd == IMM_REG) && ((beq_opcode <= inst->opcode  &&  inst->opcode <= bge_opcode) || inst->opcode==sw_opcode || inst->opcode == out_opcode))
     {
         return I_TYPE;
     }
@@ -61,11 +61,11 @@ int instructionType(Instruction* inst)
 int instructionTypeFromLine(char* line)
 {
     //if one of the registers in the line is the immidiate register
-    int rt = slice_atoi_hex(line, 4, 5);//set rt to to its numeric value
-    int rs = slice_atoi_hex(line, 3, 4);//set rs to to its numeric value
-    int rd = slice_atoi_hex(line, 2, 3);//set rd to to its numeric value
-    int opcode = slice_atoi_hex(line, 0, 2);//set opcode to to its numeric value
-    if ((rd == IMM_REG) && ((beq_opcode <= opcode && opcode <= bge_opcode) || opcode == sw_opcode)) {
+    int rt = slice_atoi_hex(line, 4, 5);//set rt to its numeric value
+    int rs = slice_atoi_hex(line, 3, 4);//set rs to its numeric value
+    int rd = slice_atoi_hex(line, 2, 3);//set rd to its numeric value
+    int opcode = slice_atoi_hex(line, 0, 2);//set opcode to its numeric value
+    if ((rd == IMM_REG) && ((beq_opcode <= opcode && opcode <= bge_opcode) || opcode == sw_opcode || opcode == out_opcode)) {
         return I_TYPE;
     }
     if ((rs == IMM_REG) || (rt == IMM_REG)) {
