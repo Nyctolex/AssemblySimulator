@@ -127,9 +127,24 @@ void add_word(char *line, char *memin_str)
                                         temp_var[j+1] = '\0';
                                         if (hex == 1)
                                             {
-                                            for (int k = 2; k < 7; k++) line_val[k - 2] = temp_var[k];
+                                                for (int k = 2; k < 7; k++) line_val[k - 2] = temp_var[k];
+                                                int len = strlen(line_val);
+                                                if (len < 5)
+                                                    {
+                                                        for (int l=0; l<5-len; l++)
+                                                            {
+                                                                for (int k=0; k<5; k++)
+                                                                    {
+                                                                        line_val[5-k] = line_val[5-k-1];
+                                                                    }
+                                                            }
+                                                        for (int k=0; k<5-len; k++)
+                                                            {
+                                                                line_val[k] = '0';
+                                                            }
+                                                    }
                                             }
-                                        else sprintf(line_val, "%05X", atoi(temp_var));;
+                                        else sprintf(line_val, "%05X", atoi(temp_var));
                                         break;
                                     }
                             }
@@ -298,7 +313,7 @@ int main(int arg_amount, char *arg_vals[])
         remove zeros?
         add comments
         add header file
-        ! imm in 1st reg in jumps
+        ! hex imm in .word
         ! this:
             add $t0, $imm, $imm, 3
             add $imm, $zero, $imm, 3
