@@ -1,2 +1,4 @@
 ﻿  Main.c
+C:\GitHub\AssemblySimulator\Compiler\Main.c(118,48): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'char *'
+C:\GitHub\AssemblySimulator\Compiler\Main.c(118,48): warning C4313: 'printf': '%d' in format string conflicts with argument 1 of type 'char *'
   Project1.vcxproj -> C:\GitHub\AssemblySimulator\Compiler\Project1\x64\Debug\Project1.exe
