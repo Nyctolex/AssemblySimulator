@@ -35,10 +35,14 @@ PRINT_DOT:
     set t0 1
     out t0, imm, zero, 22 #set monitorcmd to 1
     add s2, s2, imm, 1 #inc x counter
+    set t0 255
+    bgt imm, s2, t0, NEXT_ROW #if the x value is more than 255
     jmp LOOP_X #jump to LOOP_X
 NEXT_ROW:
     bgt imm, s0, s1, RETURN #if we are out of the y range values, return
     add s0, s0, imm, 1 #s0+=1
+    set t0 255
+    bgt imm, s0, t0, RETURN #if we are out of the y range values, return
     jmp LOOP_Y #jump to the LOOP_Y
 RETURN:
     pop s2

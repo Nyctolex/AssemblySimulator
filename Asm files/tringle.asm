@@ -60,10 +60,14 @@ PRINT_DOT:
     add $t0, $imm, $zero, 1
     out $t0, $imm, $zero, 22                  #set monitorcmd to 1
     add $s2, $s2, $imm, 1                     #inc x counter
+    add $t0, $imm, $zero, 255
+    bgt $imm, $s2, $t0, NEXT_ROW              #if the x value is more than 255
     jal $zero, $imm, $zero, LOOP_X            #jump to LOOP_X
 NEXT_ROW:
     bgt $imm, $s0, $s1, RETURN                #if we are out of the y $range values, return
     add $s0, $s0, $imm, 1                     #$s0+=1
+    add $t0, $imm, $zero, 255
+    bgt $imm, $s0, $t0, RETURN                #if we are out of the y $range values, return
     jal $zero, $imm, $zero, LOOP_Y            #jump to the LOOP_Y
 RETURN:
     lw $s2, $zero, $sp, 0                     #poping $s2 from stack, 
