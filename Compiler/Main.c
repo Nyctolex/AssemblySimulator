@@ -23,8 +23,8 @@ int is_imm(char *line)
                         if (isalpha(line[i])) counter++;
                     }
                 else if (line[i] == '$' && isspace(line[i-1])) counter++;
-                if (line[i] == 'i' && line[i+1] == 'm' && line[i+2] == 'm' && counter != 2) return TRUE;
-                if (line[i] == 'i' && line[i+1] == 'm' && line[i+2] == 'm' && counter == 2) return FALSE;
+                if (line[i] == 'i' && line[i+1] == 'm' && line[i+2] == 'm' && counter != 1) return TRUE;
+                if (line[i] == 'i' && line[i+1] == 'm' && line[i+2] == 'm' && counter == 1) return FALSE;
             }
         return FALSE;
     }
@@ -43,7 +43,7 @@ int search_label(char *line, int line_index, int line_loc, Label *label_list) //
     {
         for (int i = 0; i < MAX_LINE_SIZE; i++)
             {
-                if (line[i] == '\0') break;
+                if (line[i] == '\0' || line[i] == '\n') break;
                 if (line[i] == ':')
                     {
                         add_label(line, line_loc, label_list);
@@ -98,7 +98,7 @@ void add_word(char *line, char *memin_str)
                     }
                 if (isalnum(line[i]))
                     {
-                        if (line[i] == '0' && line[i+1] == 'x')
+                        if (line[i] == '0' && (line[i+1] == 'x' || line[i+1] == 'X'))
                             hex = 1;
                         temp_var[j] = line[i];
                         if (isspace(line[i+1]))
@@ -115,12 +115,13 @@ void add_word(char *line, char *memin_str)
                                 else if (counter == 1)
                                     {
                                         temp_var[j+1] = '\0';
-                                        printf("%s %d", temp_var, j);
-                                        if (hex == 1) sprintf(line_val, "%05X", extend_sign(strtoul(temp_var, NULL, 16)));
+                                        if (hex == 1)
+                                            {
+                                            for (int k = 2; k < 7; k++) line_val[k - 2] = temp_var[k];
+                                            }
                                         else sprintf(line_val, "%05X", atoi(temp_var));;
                                         break;
                                     }
-                                printf("%d\n", j);
                             }
                         j++;
                     }
@@ -145,10 +146,18 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list,
         int not_imm = 0;
         for (int i = 0; i < strlen(line); i++)
             {
-                if ((line[i] == '0') && (line[i+1] == 'x'))
+                if ((line[i] == '0') && (line[i+1] == 'x' || line[i+1] == 'X'))
                     {
                         hex_num = 1;
                         break;
+                    }
+            }
+        for (int i = 0; i < strlen(line); i++)
+            {
+                if (!(line[i] == ' '))
+                    {
+                        if (line[i] != '\n') break;
+                        else return;
                     }
             }
         for (int i = 0; i < strlen(line); i++)
@@ -173,7 +182,7 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list,
                                 var[len] = line[i];
                                 var[++len] = '\0';
                             }
-                        if (var[0] == '0' && var[1] == 'x' && not_imm == 0)
+                        if (var[0] == '0' && (var[1] == 'x' || var[1] == 'X') && not_imm == 0)
                             {
                                 strcpy(temp_str, var+sizeof(char)*2);
                                 int number = (int)strtoul(temp_str, NULL, 16);
@@ -279,9 +288,12 @@ int main(int arg_amount, char *arg_vals[])
         remove zeros?
         add comments
         add header file
+        ! imm in 1st reg in jumps
         ! this:
             add $t0, $imm, $imm, 3
             add $imm, $zero, $imm, 3
             .word 5 0x2
             ! is printing 2E at line 6
+        ? should .word overwrite the n or n+1 line ?
+        ? is a commented line counted for labels ?
 */
