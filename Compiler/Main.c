@@ -16,6 +16,7 @@ int memin_loc = 0;
 int is_imm(char *line)
     {
         int counter = 0;
+        int jump = 0;
         for (int i = 0; i < MAX_LINE_SIZE; i++)
             {
                 if (i == 0)
@@ -23,7 +24,16 @@ int is_imm(char *line)
                         if (isalpha(line[i])) counter++;
                     }
                 else if (line[i] == '$' && isspace(line[i-1])) counter++;
+                if (line[i] == 'b' && line[i+1] == 'e' && line[i+2] == 'q') jump=1;
+                if (line[i] == 'b' && line[i+1] == 'n' && line[i+2] == 'e') jump=1;
+                if (line[i] == 'b' && line[i+1] == 'l' && line[i+2] == 't') jump=1;
+                if (line[i] == 'b' && line[i+1] == 'g' && line[i+2] == 't') jump=1;
+                if (line[i] == 'b' && line[i+1] == 'l' && line[i+2] == 'e') jump=1;
+                if (line[i] == 'b' && line[i+1] == 'g' && line[i+2] == 'e') jump=1;
+                if (line[i] == 's' && line[i+1] == 'w') jump=1;
+                if (line[i] == 'o' && line[i+1] == 'u' && line[i+2] == 't') jump=1;
                 if (line[i] == 'i' && line[i+1] == 'm' && line[i+2] == 'm' && counter != 1) return TRUE;
+                if (line[i] == 'i' && line[i+1] == 'm' && line[i+2] == 'm' && counter == 1 && jump == 1) return TRUE;
                 if (line[i] == 'i' && line[i+1] == 'm' && line[i+2] == 'm' && counter == 1) return FALSE;
             }
         return FALSE;
