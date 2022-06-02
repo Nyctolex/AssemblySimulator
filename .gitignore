@@ -93,3 +93,4 @@ Compiler/Project1/.vs/Project1/v17/.suo
 *.ipch
 Simulator/ConsoleApplication1/test.asm
 *.xlsx
+*.pdb
