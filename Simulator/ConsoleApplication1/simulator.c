@@ -241,7 +241,7 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
         next_clk;
         if (*pc_pointer != old_pc){ // if the intterupt changed the pc
             return;
-        } 
+        }
         regs[IMM_REG] = inst->imm;
         pc_adder = 2;
     }
