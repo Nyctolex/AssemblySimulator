@@ -1,5 +1,42 @@
-﻿  simulator.c
-C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\AssemblySimulator\Simulator\ConsoleApplication1\simulator.h(4,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition
-C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\AssemblySimulator\Simulator\ConsoleApplication1\simulator.c : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
-C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\AssemblySimulator\Simulator\ConsoleApplication1\simulator.c(91,9): warning C4101: 'clk_cycle': unreferenced local variable
-  ConsoleApplication1.vcxproj -> C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\AssemblySimulator\Simulator\x64\Debug\ConsoleApplication1.exe
+﻿  IO.c
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.h(51,1): warning C4005: 'reserved': macro redefinition
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.h(50): message : see previous definition of 'reserved'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.c(10,9): warning C4033: 'timer' must return a value
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.c(14,30): warning C4047: '=': 'int' differs in levels of indirection from 'int *'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.c(15,31): warning C4047: '=': 'int *' differs in levels of indirection from 'int'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.c(25,34): warning C4047: '==': 'int' differs in levels of indirection from 'int *'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.c(31,25): warning C4047: '!=': 'int *' differs in levels of indirection from 'int'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.c(33,39): warning C4047: 'function': 'int' differs in levels of indirection from 'int *'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.c(33,32): warning C4024: 'irq': different types for formal and actual parameter 3
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.c(64,34): warning C4047: '=': 'int *' differs in levels of indirection from 'int'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.c(83,39): warning C4013: 'strcpy' undefined; assuming extern returning int
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.c(91,29): warning C4047: '!=': 'int *' differs in levels of indirection from 'int'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.c(91,53): warning C4047: '!=': 'int *' differs in levels of indirection from 'int'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.c(92,28): warning C4047: '==': 'int *' differs in levels of indirection from 'int'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.c(102,31): warning C4047: '!=': 'int' differs in levels of indirection from 'int *'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.c(104,34): warning C4047: '=': 'int *' differs in levels of indirection from 'int'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.c(105,36): warning C4477: 'fprintf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'int *'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.c(105,36): warning C4313: 'fprintf': '%d' in format string conflicts with argument 1 of type 'int *'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.c(105,36): warning C4477: 'fprintf' : format string '%08X' requires an argument of type 'unsigned int', but variadic argument 2 has type 'int *'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.c(105,36): warning C4313: 'fprintf': '%X' in format string conflicts with argument 2 of type 'int *'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.c(170,35): warning C4477: 'fprintf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'int *'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.c(170,35): warning C4313: 'fprintf': '%d' in format string conflicts with argument 1 of type 'int *'
+  simulator.c
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\simulator.h(4,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\simulator.c : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.h(51,1): warning C4005: 'reserved': macro redefinition
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.h(50): message : see previous definition of 'reserved'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\simulator.c(82,43): warning C4047: 'function': 'int *' differs in levels of indirection from 'int'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\simulator.c(82,34): warning C4024: 'write_cycles': different types for formal and actual parameter 2
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\simulator.c(108,102): warning C4047: 'function': 'int *' differs in levels of indirection from 'int'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\simulator.c(108,99): warning C4024: 'IO_handler': different types for formal and actual parameter 9
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\simulator.c(131,10): warning C4101: 'imm_line': unreferenced local variable
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\simulator.c(183,24): warning C4477: 'fprintf' : format string '%u' requires an argument of type 'unsigned int', but variadic argument 1 has type 'int *'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\simulator.c(183,24): warning C4313: 'fprintf': '%u' in format string conflicts with argument 1 of type 'int *'
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\simulator.c(200,10): warning C4101: 'line_str': unreferenced local variable
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\simulator.c(217,9): warning C4101: 'chars': unreferenced local variable
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\simulator.c(233,1): warning C4029: declared formal parameter list different from definition
+  Generating Code...
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.c(11): warning C4716: 'timer': must return a value
+C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\ConsoleApplication1\IO.c(17): warning C4716: 'irq': must return a value
+  ConsoleApplication1.vcxproj -> C:\Users\USER\OneDrive\Documents\year c\Semester B\computer organization\Project\gitreclone2\Simulator\x64\Debug\ConsoleApplication1.exe

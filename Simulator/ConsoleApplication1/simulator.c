@@ -231,12 +231,16 @@ void write_diskout(FILE* fp_diskout, char disk_memory[][MAX_DISK_LINE_LEN]) {
 
 void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MAX_SIZE], int* pc_pointer, int* is_in_task, int irq2[], int monitor[], char disk_memory[][MAX_DISK_LINE_LEN], FILE** file_pointers[], int* disk_cycle_ptr)
 {
+    int old_pc = *pc_pointer;
     int io_target_reg;
     int old_imm = inst->imm;
     int pc_adder = 1; // adding 1 or 2 according to the type of the instruction.
     if (instructionType(inst) == I_TYPE)
     {
         next_clk;
+        if (*pc_pointer != old_pc) { // if the value of the pc was changed by intteruption
+            return;
+        }
         regs[IMM_REG] = inst->imm;
         pc_adder = 2;
     }
@@ -373,14 +377,14 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
         *pc_pointer = regs[inst->rs];
         break;
     case 16: // lw
-        next_clk;
         *pc_pointer += pc_adder;
         regs[inst->rd] = extend_sign(strtoul(memory[regs[inst->rs] + regs[inst->rt]], NULL, 16));
+        next_clk;
         break;
     case 17: // sw
-        next_clk;
         *pc_pointer += pc_adder;
         sprintf(memory[regs[inst->rs] + regs[inst->rt]], "%05X", regs[inst->rd]);
+        next_clk;
         break;
     case 18: // reti
         *pc_pointer += pc_adder;
