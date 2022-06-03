@@ -11,9 +11,15 @@ int timer(int ioreg[])
     }
 int irq(int ioreg[], int* pc, int *is_task)
     {
-        ioreg[irqreturn] = pc;
-        pc = ioreg[irqhandler];
-        is_task = 1;
+        ioreg[irq0enable] = 0;
+        ioreg[irq2enable] = 0;
+        ioreg[irq1enable] = 0;
+        ioreg[irq0status] = 0;
+        ioreg[irq1status] = 0;
+        ioreg[irq2status] = 0;
+        ioreg[irqreturn] = *pc;
+        *pc = ioreg[irqhandler];
+        *is_task = 1;
     }
 void IO_handler(int ioreg[], int monitor_arr[], char disk_memory[][MAX_DISK_LINE], int* pc, int* is_task, int irq2[], int *disk_cycle, char memory[LINES_MAX][LINES_MAX_SIZE], int *led, FILE *leds_file, FILE *display7seg_file)
     {
@@ -28,8 +34,10 @@ void IO_handler(int ioreg[], int monitor_arr[], char disk_memory[][MAX_DISK_LINE
                         break;
                     }
             }
-        if (is_task != 1) // if in task
-            if ((ioreg[irq0enable] && ioreg[irq0status]) || (ioreg[irq1enable] && ioreg[irq1status]) || (ioreg[irq2enable] && ioreg[irq2status]))
+        int *is_irq2 = in_irq2(pc,irq2);
+        // printf("is_irq = %d, enable = %d, pc = %d\n", is_irq2, ioreg[irq2enable], *pc);
+        if (*is_task != 1) // if in task
+            if ((ioreg[irq0enable] && ioreg[irq0status]) || (ioreg[irq1enable] && ioreg[irq1status]) || (ioreg[irq2enable] && (is_irq2 == 1)))
                 irq(ioreg, pc, is_task);
         monitor(monitor_arr, ioreg);
         disk_command(ioreg, disk_memory, disk_cycle, memory);
@@ -45,7 +53,16 @@ void add_irq2(FILE* irq2in, int* irq2) // create array of line numbers of irq2 i
             {
                 irq2[i++] = atoi(line);
             }
-        irq2[i] = '-1';
+        *(irq2+i) = -1;
+    }
+int in_irq2(int *pc, int *irq2) // check if the pc should raise irq2status
+    {
+        for (int i=0; irq2[i] != -1; i++)
+            {
+                // printf("%d %d\n", *pc, *(irq2+i));
+                if(*pc == *(irq2+i)) return(1);
+            }
+        return(0);
     }
 void monitor(int monitor_arr[], int ioreg[]) // print to monitor
     {
