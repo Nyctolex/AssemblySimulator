@@ -168,7 +168,10 @@ void hwregtrace_write(FILE *fp, int cycle, int read_write, int reg_num, int data
                 case diskstatus:
                     sprintf(reg_name, "diskstatus");
                     break;
-                case reserved:
+                case reserved1:
+                    sprintf(reg_name, "reserved");
+                    break;
+                case reserved2:
                     sprintf(reg_name, "reserved");
                     break;
                 case monitoraddr:
@@ -185,9 +188,10 @@ void hwregtrace_write(FILE *fp, int cycle, int read_write, int reg_num, int data
     }
 void display7seg_write(FILE *display7seg_file, int ioreg[], int *pc) // write to display7seg file
     {
-        if (ioreg[leds] != ioreg[24])
+        if (ioreg[display7seg] != ioreg[24])
             {
+                printf("%d %X\n", ioreg[display7seg], ioreg[display7seg]);
                 fprintf(display7seg_file, "%d %08X\n", *pc, ioreg[display7seg]); // print to file
-                ioreg[24] = ioreg[leds];
+                ioreg[24] = ioreg[display7seg];
             }
     }

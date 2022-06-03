@@ -47,8 +47,8 @@
     # define disksector 15
     # define diskbuffer 16
     # define diskstatus 17
-    # define reserved 18
-    # define reserved 19
+    # define reserved1 18
+    # define reserved2 19
     # define monitoraddr 20
     # define monitordata 21
     # define monitorcmd 22
