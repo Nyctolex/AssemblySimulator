@@ -272,7 +272,7 @@ void iter_lines(FILE *fp, char iter_type, Label *label_list, FILE *memin, char *
         int line_loc = 0;
         while (fgets(line, MAX_LINE_SIZE, asm_file))
             {
-                if (line[0] == '\n') return;
+                if (line[0] == '\n') continue;
                 if (iter_type == GET_LABEL) line_loc = search_label(line, line_index, line_loc, label_list); // iterate and find all labels
                 else if (iter_type == TRANSLATE_ITER) translate_file(line, line_index, line_loc, label_list, memin, memin_str); // iterate and translate to hex
                 line_index++;
@@ -320,4 +320,5 @@ int main(int arg_amount, char *arg_vals[])
             ! is printing 2E at line 6
         ? should .word overwrite the n or n+1 line ?
         ? is a commented line counted for labels ?
+        ? can hex data be with "-" ?
 */

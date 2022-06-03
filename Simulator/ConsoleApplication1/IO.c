@@ -9,7 +9,7 @@ int timer(int ioreg[])
         }
         return;
     }
-int irq(int ioreg[], int* pc, int is_task)
+int irq(int ioreg[], int* pc, int *is_task)
     {
         ioreg[irqreturn] = pc;
         pc = ioreg[irqhandler];
@@ -99,73 +99,95 @@ void disk_command(int ioreg[], char disk_memory[][MAX_DISK_LINE], int *disk_cycl
     }
 void led_write(int ioreg[], int *led, FILE *leds_file, int *pc)
     {
-        if (ioreg[leds] != led)
+        if (ioreg[leds] != ioreg[23])
             {
-                led = ioreg[leds];
-                fprintf(leds_file, "%d %08X\n", pc, led); // write to leds
+                ioreg[23] = ioreg[leds];
+                fprintf(leds_file, "%d %08X\n", *pc, ioreg[23]); // write to leds
             }
     }
 void hwregtrace_write(FILE *fp, int cycle, int read_write, int reg_num, int data) // write hwregtrace file
     {
         unsigned int data_unsigned = (unsigned) data;
         char action[6] = {0};
-        char reg_name[5] = {0};
+        char reg_name[50] = {0};
         if (read_write == 0) sprintf(action, "READ");
         else if (read_write == 1) sprintf(action, "WRITE");
         switch(reg_num)
             {
-                case zero_reg:
-                    sprintf(reg_name, "zero");
+                case irq0enable:
+                    sprintf(reg_name, "irq0enable");
                     break;
-                case imm_reg:
-                    sprintf(reg_name, "imm");
+                case irq1enable:
+                    sprintf(reg_name, "irq1enable");
                     break;
-                case v0_reg:
-                    sprintf(reg_name, "v0");
+                case irq2enable:
+                    sprintf(reg_name, "irq2enable");
                     break;
-                case a0_reg:
-                    sprintf(reg_name, "a0");
+                case irq0status:
+                    sprintf(reg_name, "irq0status");
                     break;
-                case a1_reg:
-                    sprintf(reg_name, "a1");
+                case irq1status:
+                    sprintf(reg_name, "irq1status");
                     break;
-                case a2_reg:
-                    sprintf(reg_name, "a2");
+                case irq2status:
+                    sprintf(reg_name, "irq2status");
                     break;
-                case a3_reg:
-                    sprintf(reg_name, "a3");
+                case irqhandler:
+                    sprintf(reg_name, "irqhandler");
                     break;
-                case t0_reg:
-                    sprintf(reg_name, "t0");
+                case irqreturn:
+                    sprintf(reg_name, "irqreturn");
                     break;
-                case t1_reg:
-                    sprintf(reg_name, "t1");
+                case clks:
+                    sprintf(reg_name, "clks");
                     break;
-                case t2_reg:
-                    sprintf(reg_name, "t2");
+                case leds:
+                    sprintf(reg_name, "leds");
                     break;
-                case s0_reg:
-                    sprintf(reg_name, "s0");
+                case display7seg:
+                    sprintf(reg_name, "display7seg");
                     break;
-                case s1_reg:
-                    sprintf(reg_name, "s1");
+                case timerenable:
+                    sprintf(reg_name, "timerenable");
                     break;
-                case s2_reg:
-                    sprintf(reg_name, "s2");
+                case timercurrent:
+                    sprintf(reg_name, "timercurrent");
                     break;
-                case gp_reg:
-                    sprintf(reg_name, "gp");
+                case timermax:
+                    sprintf(reg_name, "timermax");
                     break;
-                case sp_reg:
-                    sprintf(reg_name, "sp");
+                case diskcmd:
+                    sprintf(reg_name, "diskcmd");
                     break;
-                case ra_reg:
-                    sprintf(reg_name, "ra");
+                case disksector:
+                    sprintf(reg_name, "disksector");
+                    break;
+                case diskbuffer:
+                    sprintf(reg_name, "diskbuffer");
+                    break;
+                case diskstatus:
+                    sprintf(reg_name, "diskstatus");
+                    break;
+                case reserved:
+                    sprintf(reg_name, "reserved");
+                    break;
+                case monitoraddr:
+                    sprintf(reg_name, "monitoraddr");
+                    break;
+                case monitordata:
+                    sprintf(reg_name, "monitordata");
+                    break;
+                case monitorcmd:
+                    sprintf(reg_name, "monitorcmd");
                     break;
             }
-        fprintf(fp, "%d %s %s %08X\n", cycle, action, reg_name, data_unsigned); // print to file
+        fprintf(fp, "%d %s %s %08X\n", cycle-1, action, reg_name, data_unsigned); // print to file
     }
 void display7seg_write(FILE *display7seg_file, int ioreg[], int *pc) // write to display7seg file
     {
-        fprintf(display7seg_file, "%d %08X\n", pc, ioreg[display7seg]); // print to file
+        if (ioreg[leds] != ioreg[24])
+            {
+                fprintf(display7seg_file, "%d %08X\n", *pc, ioreg[display7seg]); // print to file
+                ioreg[24] = ioreg[leds];
+            }
     }

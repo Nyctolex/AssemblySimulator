@@ -9,8 +9,8 @@
 # define MAX_DISK_LINE 10
 # define SECTOR_AMOUNT 128
 # define SECTOR_SIZE 128
-# define LINES_MAX 4096 // ! make sure
-# define LINES_MAX_SIZE 10 // ! make sure
+# define LINES_MAX 4096
+# define LINES_MAX_SIZE 10
 
     #define zero_reg 0
 	#define imm_reg  1
@@ -64,4 +64,3 @@ void hwregtrace_write(FILE *fp, int cycle, int read_write, int reg_num, int data
 void display7seg_write(FILE *display7seg_file, int ioreg[], int *pc);
 
 # endif
-// ! add comments
