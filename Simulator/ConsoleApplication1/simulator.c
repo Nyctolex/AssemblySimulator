@@ -237,9 +237,6 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
     {
         old_pc = *pc_pointer;
         next_clk;
-        if (*pc_pointer != old_pc){ // if the intterupt changed the pc
-            return;
-        }
         regs[IMM_REG] = inst->imm;
         pc_adder = 2;
     }
@@ -250,6 +247,9 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
     }
     //Write Trace
     write_trace(*file_pointers[TRACE], *pc_pointer, memory, regs);
+    if (*pc_pointer != old_pc) { // if the intterupt changed the pc
+        return;
+    }
     switch (inst->opcode)
     {
     case 0: // add
