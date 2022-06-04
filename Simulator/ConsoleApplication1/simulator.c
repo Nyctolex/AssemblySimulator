@@ -230,26 +230,28 @@ void write_diskout(FILE* fp_diskout, char disk_memory[][MAX_DISK_LINE_LEN]) {
 void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MAX_SIZE], int* pc_pointer, int* is_in_task, int irq2[], int monitor[], char disk_memory[][MAX_DISK_LINE_LEN], FILE** file_pointers[], int* disk_cycle_ptr)
 {
     int io_target_reg;
-    int old_pc = *pc_pointer;
+    int old_pc;
     int old_imm = inst->imm;
     int pc_adder = 1; // adding 1 or 2 according to the type of the instruction.
     if (instructionType(inst) == I_TYPE)
     {
+        ioreg[26] = 1; //set I type flag to 1
         old_pc = *pc_pointer;
         next_clk;
+        if (*pc_pointer != old_pc){ // if the intterupt changed the pc
+            return;
+        }
         regs[IMM_REG] = inst->imm;
         pc_adder = 2;
     }
     else
     {
+        ioreg[26] = 0; //set I type flag to 1
         regs[IMM_REG] = 0;
         old_imm = 0;
     }
     //Write Trace
     write_trace(*file_pointers[TRACE], *pc_pointer, memory, regs);
-    if (*pc_pointer != old_pc) { // if the intterupt changed the pc
-        return;
-    }
     switch (inst->opcode)
     {
     case 0: // add
