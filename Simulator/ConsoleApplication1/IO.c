@@ -24,7 +24,6 @@ void IO_handler(int ioreg[], int monitor_arr[], char disk_memory[][MAX_DISK_LINE
                     timer(ioreg); // update processor time
             }
         int is_irq2 = in_irq2(ioreg,irq2);
-        printf("clk = %d, enable = %d, is_irq = %d, pc = %d\n", ioreg[clks], ioreg[irq2enable], is_irq2, *pc);
         if (*is_task != 1) // if in task
             if ((ioreg[irq0enable] && ioreg[irq0status]) || (ioreg[irq1enable] && ioreg[irq1status]) || (ioreg[irq2enable] && (is_irq2 == 1)))
                 irq(ioreg, pc, is_task);
@@ -33,7 +32,6 @@ void IO_handler(int ioreg[], int monitor_arr[], char disk_memory[][MAX_DISK_LINE
         led_write(ioreg, led, leds_file, pc);
         display7seg_write(display7seg_file, ioreg, pc);
     }
-
 void add_irq2(FILE* irq2in, int* irq2) // create array of line numbers of irq2 interrupts
     {
         char line[max_irq2_line];
@@ -46,14 +44,9 @@ void add_irq2(FILE* irq2in, int* irq2) // create array of line numbers of irq2 i
     }
 int in_irq2(int ioreg[], int *irq2) // check if the pc should raise irq2status
     {
-        int clk = 0;
-        if (ioreg[26] == 0)
-            clk = ioreg[clks] - 1;
-        else if (ioreg[26] == 1)
-            clk = ioreg[clks] - 2;
         for (int i=0; irq2[i] != -1; i++)
             {
-                if(clk == *(irq2+i)) return(1);
+                if(ioreg[clks] == *(irq2+i)) return(1);
             }
         return(0);
     }
@@ -71,9 +64,10 @@ void disk_command(int ioreg[], char disk_memory[][MAX_DISK_LINE], int *disk_cycl
         int line_index = -1;
         if ((ioreg[diskcmd] != 0) && (*disk_cycle == 0)) // if there is a disk cmd and the disk is available
             {
-                *disk_cycle = 1024;
                 if (ioreg[diskstatus] == 0) // if disk is not busy
                     {
+                        *disk_cycle = 1024;
+                        ioreg[diskstatus] = 1;
                         if (ioreg[diskcmd] == 1) // read sector
                             {
                                 // for (int i=1000; i<LINES_MAX; i++) // for every memory line greater than 1000
@@ -96,24 +90,27 @@ void disk_command(int ioreg[], char disk_memory[][MAX_DISK_LINE], int *disk_cycl
                                 //     }
                                 // ! is needed?
                                 line_index = ioreg[disksector]*SECTOR_SIZE+ioreg[diskbuffer];
-                                printf("%d", line_index);
+                                // printf("%d", line_index);
                                 strcpy(memory[line_index], disk_memory[ioreg[disksector]*SECTOR_SIZE+ioreg[diskbuffer]]); // read from disk
                             }
                         else if (ioreg[diskcmd] == 2) // write sector
                             {
                                 line_index = ioreg[disksector]*SECTOR_SIZE+ioreg[diskbuffer]; // ! is true?
-                                printf("%d", line_index);
+                                printf("%d %d %s\n",ioreg[disksector]*SECTOR_SIZE+ioreg[diskbuffer], line_index, memory[line_index]);
                                 strcpy(disk_memory[ioreg[disksector]*SECTOR_SIZE+ioreg[diskbuffer]], memory[line_index]); // write to disk
                             }
                     }
             }
-        if ((disk_cycle != 1) && (disk_cycle != 1024)) disk_cycle--; // if the disk is not available decrease 1 from cycles until available
-        if (disk_cycle == 1) // declare the disk as available next cycle
+        else if (*disk_cycle > 1) 
+                {
+                    *disk_cycle = *disk_cycle - 1; // if the disk is not available decrease 1 from cycles until available
+                }
+        else if (*disk_cycle == 1) // declare the disk as available next cycle
             {
                 ioreg[diskcmd] = 0;
                 ioreg[diskstatus] = 0;
                 ioreg[irq1status] = 1;
-                disk_cycle--;
+                *disk_cycle = 0;
             }
     }
 void led_write(int ioreg[], int *led, FILE *leds_file, int *pc)
@@ -209,7 +206,7 @@ void display7seg_write(FILE *display7seg_file, int ioreg[], int *pc) // write to
     {
         if (ioreg[display7seg] != ioreg[24])
             {
-                printf("%d %X\n", ioreg[display7seg], ioreg[display7seg]);
+                // printf("%d %X\n", ioreg[display7seg], ioreg[display7seg]);
                 fprintf(display7seg_file, "%d %08X\n", *pc, ioreg[display7seg]); // print to file
                 ioreg[24] = ioreg[display7seg];
             }
