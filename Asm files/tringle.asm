@@ -1,3 +1,5 @@
+add $t2, $zero, $imm, 1          #$t2 = 1
+sll $sp, $t2, $imm, 11           #set $sp = 1 << 11 = 2048
 add $sp, $imm, $sp, -4                        #allocating memory in the stack
 sw $ra, $zero, $sp, 0                         #pushing $ra to stack
 jal $ra, $imm, $zero, CALC_AB                 #calling function CALC_AB

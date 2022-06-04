@@ -141,7 +141,7 @@ void write_cycles(FILE* fp_cycles, int* cycles);
  * @param inst the current instruction
  * @param regs a pointer to the array of the registers
  */
-void write_trace(FILE* fp_trace, int pc, Instruction* inst, int* regs);
+void write_trace(FILE* fp_trace, int pc, char memory[][LINE_MAX_SIZE], int* regs);
 /**
  * @brief reading the memory in the input folder and coping it to the memory matrix
  * 

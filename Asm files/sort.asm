@@ -1,3 +1,5 @@
+add $t2, $zero, $imm, 1          #$t2 = 1
+sll $sp, $t2, $imm, 11           #set $sp = 1 << 11 = 2048
 add $a0, $imm, $zero, 0x100                      #$a0 = baseadress
 add $sp, $imm, $sp, -4                         #allocating memory in the stack
 sw $ra, $zero, $sp, 0                          #pushing $ra to stack

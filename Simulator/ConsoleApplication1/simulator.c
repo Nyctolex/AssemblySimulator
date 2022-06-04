@@ -21,8 +21,6 @@ int main(int argc, char* argv[])
     const int output_file_index = 4; // All file after this inex are output files
     // arrays which would represent the register of the proccessor and the io registers
     int regs[NUM_REGS] = { 0 }, ioreg[NUM_IOREGS+5] = { 0 };
-    //setting the value of the stack pointer to be at the end of the memory
-    regs[SP_REG] = MAX_LINES;
     char memory[MAX_LINES][LINE_MAX_SIZE];
     //setting all lines to 000
     reset_memory(memory);
@@ -189,10 +187,10 @@ void write_regout(FILE* fp_regout, int* reg)
     fprintf(fp_regout, "%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n%08X\n", R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15);
 }
 
-void write_trace(FILE* fp_trace, int pc, Instruction* inst, int* regs)
+void write_trace(FILE* fp_trace, int pc,char memory[][LINE_MAX_SIZE], int* regs)
 {
     int R0 = regs[0], R1 = regs[1], R2 = regs[2], R3 = regs[3], R4 = regs[4], R5 = regs[5], R6 = regs[6], R7 = regs[7], R8 = regs[8], R9 = regs[9], R10 = regs[10], R11 = regs[11], R12 = regs[12], R13 = regs[13], R14 = regs[14], R15 = regs[15];
-    fprintf(fp_trace, "%03X %05X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X\n", pc, inst->opcode, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15);
+    fprintf(fp_trace, "%03X %s %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X %08X\n", pc, memory[pc], R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15);
 }
 
 void write_memout(FILE* fp_memout, char memory[][LINE_MAX_SIZE]) {
@@ -250,6 +248,8 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
         regs[IMM_REG] = 0;
         old_imm = 0;
     }
+    //Write Trace
+    write_trace(*file_pointers[TRACE], *pc_pointer, memory, regs);
     switch (inst->opcode)
     {
     case 0: // add
@@ -431,8 +431,6 @@ void run_instructions(int regs[NUM_REGS], int* ioreg, FILE** file_pointers[], ch
         //fetch instruction from memory
         current_instruction = read_instruction(pc, memory);
         //instructionPrintInstruction(current_instruction);
-        // Write trace
-        write_trace(fp_trace, pc, current_instruction, regs);
         // execute the next instruction from the assembly
         decode_inst(regs, ioreg, current_instruction, memory, pc_pointer, is_in_task, irq2, monitor, disk_memory, file_pointers, disk_cycle_ptr);
         //print_reg_state(pc, regs, current_instruction);
