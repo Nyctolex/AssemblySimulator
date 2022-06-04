@@ -96,7 +96,6 @@ void disk_command(int ioreg[], char disk_memory[][MAX_DISK_LINE], int *disk_cycl
                         else if (ioreg[diskcmd] == 2) // write sector
                             {
                                 line_index = ioreg[disksector]*SECTOR_SIZE+ioreg[diskbuffer]; // ! is true?
-                                printf("%d %d %s\n",ioreg[disksector]*SECTOR_SIZE+ioreg[diskbuffer], line_index, memory[line_index]);
                                 strcpy(disk_memory[ioreg[disksector]*SECTOR_SIZE+ioreg[diskbuffer]], memory[line_index]); // write to disk
                             }
                     }

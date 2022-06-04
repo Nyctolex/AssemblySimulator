@@ -93,7 +93,7 @@ int extend_sign(int num) // extend sign of the number
 }
 void add_word(char *line, char *memin_str) // add .word data to memin
     {
-        int line_loc;
+        int line_loc = 0;
         char line_val[MAX_LINE_SIZE];
         char temp_var[MAX_LINE_SIZE];
         int counter = 0;
