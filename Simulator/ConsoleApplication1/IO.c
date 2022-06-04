@@ -2,11 +2,11 @@
 
 int timer(int ioreg[])
     {
-        if (++ioreg[timercurrent] == ioreg[timermax]) // check if the timer value is the maximal
-        {
-            ioreg[irq0status] = 1; // activate irqstatus0
-            ioreg[timercurrent] = 0; // zero timer_current
-        }
+        if (++ioreg[timercurrent] == ioreg[timermax]) // check if timer is at the max val
+            {
+                ioreg[irq0status] = 1; // activate irqstatus0
+                ioreg[timercurrent] = 0; // zero timer_current
+            }
         return;
     }
 int irq(int ioreg[], int* pc, int *is_task)
@@ -23,8 +23,12 @@ int irq(int ioreg[], int* pc, int *is_task)
     }
 void IO_handler(int ioreg[], int monitor_arr[], char disk_memory[][MAX_DISK_LINE], int* pc, int* is_task, int irq2[], int *disk_cycle, char memory[LINES_MAX][LINES_MAX_SIZE], int *led, FILE *leds_file, FILE *display7seg_file)
     {
-        if (ioreg[timerenable] == 1) // if the timer is enabled
-            timer(ioreg); // update processor time
+        if (ioreg[25] != *pc)
+            {
+                ioreg[25] = *pc;
+                if (ioreg[timerenable] == 1) // if the timer is enabled
+                    timer(ioreg); // update processor time
+            }
         for (int i = 0; irq2[i] != '\0'; i++)
             {
                 ioreg[irq2enable] = 0;

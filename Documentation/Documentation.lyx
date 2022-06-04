@@ -1,0 +1,911 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\begin_preamble
+\usepackage{color}
+\usepackage{pythontex}
+\usepackage{physics} %abs
+\usepackage{esint} % oiint
+\end_preamble
+\use_default_options true
+\begin_modules
+todonotes
+\end_modules
+\maintain_unincluded_children false
+\language hebrew
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "Segoe WP"
+\font_sans "default" "default"
+\font_typewriter "default" "Cascadia Mono"
+\font_math "auto" "default"
+\font_default_family default
+\use_non_tex_fonts true
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format pdf4
+\output_sync 0
+\bibtex_command default
+\index_command default
+\float_placement H
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize a4paper
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1cm
+\topmargin 1cm
+\rightmargin 1cm
+\bottommargin 3cm
+\headheight 1cm
+\headsep 1cm
+\footskip 1cm
+\secnumdepth 3
+\tocdepth 1
+\paragraph_separation skip
+\defskip smallskip
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+pagecolor[rgb]{0,0,0} % black
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+color [rgb]{0.85,0.85,0.85} % white
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+
+\lang english
+asd
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Title
+תיעוד פרויקט במבנה המחשב
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex TODO Note (inline)
+status open
+
+\begin_layout Plain Layout
+להוסיף תעודות זהות
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+אסמבלר
+\end_layout
+
+\begin_layout Subsection
+עיקרון פעולה
+\end_layout
+
+\begin_layout Standard
+האסמבלר מקבל כקלט קובץ אסמבלי.
+ על קובץ זה האסמבלר עובר פעמיים, בפעם הראשונה הוא עובר על כלל הלייבלים ומחליף
+ אותם במספר שאותו הם מייצגים, ובמעבר השני מתרגם את קוד האסמבלי לאופקוד המייצג
+ אותו.
+\end_layout
+
+\begin_layout Subsection
+
+\lang english
+dict
+\end_layout
+
+\begin_layout Standard
+קובץ זה הוא קובץ המשמש כמילון המתרגם סטרינג שבו השם של הרגיסטר או הפקודה,
+ למספר המייצג את המספר של הרגיסטר או הפקודה שהוכנסו.
+\end_layout
+
+\begin_layout Standard
+הגדרות הרגיסטרים:
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define zero "zero"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define imm "imm"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define v0 "v0"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define a0 "a0"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define a1 "a1"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define a2 "a2"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define a3 "a3"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define t0 "t0"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define t1 "t1"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define t2 "t2"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define s0 "s0"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define s1 "s1"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define s2 "s2"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define gp "gp"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define sp "sp"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define ra "ra"
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+הגדרות הפקודות:
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define word ".word"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define add "add"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define sub "sub"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define mul "mul"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define and "and"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define or "or"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define xor "xor"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define sll "sll"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define sra "sra"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define srl "srl"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define beq "beq"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define bne "bne"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define blt "blt"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define bgt "bgt"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define ble "ble"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define bge "bge"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define jal "jal"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define lw "lw"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define sw "sw"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define reti "reti"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define in "in"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define out "out"
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+#define halt "halt"
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+השוואה בין הביטויים:
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+thickness "0.4pt"
+separation "3pt"
+shadowsize "4pt"
+framecolor "black"
+backgroundcolor "none"
+status open
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+int compare(char *exp) // returns the expression's opcode
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+// * Registers
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+if (!strcmp(exp, zero)) return 0;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, imm)) return 1;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, v0)) return 2;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, a0)) return 3;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, a1)) return 4;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, a2)) return 5;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, a3)) return 6;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, t0)) return 7;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, t1)) return 8;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, t2)) return 9;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, s0)) return 10;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, s1)) return 11;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, s2)) return 12;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, gp)) return 13;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, sp)) return 14;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, ra)) return 15;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+// * OpCodes
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, word)) return -1;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, add)) return 0;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, sub)) return 1;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, mul)) return 2;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, and)) return 3;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, or)) return 4;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, xor)) return 5;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, sll)) return 6;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, sra)) return 7;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, srl)) return 8;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, beq)) return 9;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, bne)) return 10;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, blt)) return 11;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, bgt)) return 12;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, ble)) return 13;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, bge)) return 14;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, jal)) return 15;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, lw)) return 16;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, sw)) return 17;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, reti)) return 18;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, in)) return 19;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, out)) return 20;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+else if (!strcmp(exp, halt)) return 21;
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+\lang english
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+
+\lang english
+label
+\end_layout
+
+\begin_layout Standard
+קובץ זה מגדיר מבנה נתונים חדש בשם לייבל.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex TODO Note (inline)
+status open
+
+\begin_layout Plain Layout
+להוסיף
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+
+\lang english
+line
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex TODO Note (inline)
+status open
+
+\begin_layout Plain Layout
+האם צריך?
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+
+\lang english
+Main
+\end_layout
+
+\begin_layout Standard
+קובץ זה מכיל את הפונקציה הראשית של האסמבלר ואת כל מהלכו.
+\end_layout
+
+\end_body
+\end_document
