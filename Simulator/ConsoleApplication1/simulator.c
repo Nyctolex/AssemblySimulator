@@ -230,7 +230,7 @@ void write_diskout(FILE* fp_diskout, char disk_memory[][MAX_DISK_LINE_LEN]) {
 void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MAX_SIZE], int* pc_pointer, int* is_in_task, int irq2[], int monitor[], char disk_memory[][MAX_DISK_LINE_LEN], FILE** file_pointers[], int* disk_cycle_ptr)
 {
     int io_target_reg;
-    int old_pc;
+    int old_pc = *pc_pointer;
     int old_imm = inst->imm;
     int pc_adder = 1; // adding 1 or 2 according to the type of the instruction.
     if (instructionType(inst) == I_TYPE)
