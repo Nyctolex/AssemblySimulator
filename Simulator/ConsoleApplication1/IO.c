@@ -23,9 +23,8 @@ void IO_handler(int ioreg[], int monitor_arr[], char disk_memory[][MAX_DISK_LINE
                 if (ioreg[timerenable] == 1) // if the timer is enabled
                     timer(ioreg); // update processor time
             }
-        int is_irq2 = in_irq2(ioreg[clks],irq2);
+        int is_irq2 = in_irq2(ioreg,irq2);
         printf("clk = %d, enable = %d, is_irq = %d, pc = %d\n", ioreg[clks], ioreg[irq2enable], is_irq2, *pc);
-        // printf("is_irq = %d, enable = %d, pc = %d\n", is_irq2, ioreg[irq2enable], *pc);
         if (*is_task != 1) // if in task
             if ((ioreg[irq0enable] && ioreg[irq0status]) || (ioreg[irq1enable] && ioreg[irq1status]) || (ioreg[irq2enable] && (is_irq2 == 1)))
                 irq(ioreg, pc, is_task);
@@ -45,12 +44,15 @@ void add_irq2(FILE* irq2in, int* irq2) // create array of line numbers of irq2 i
             }
         *(irq2+i) = -1;
     }
-int in_irq2(int clk, int *irq2) // check if the pc should raise irq2status
+int in_irq2(int ioreg[], int *irq2) // check if the pc should raise irq2status
     {
+        int clk = 0;
+        if (ioreg[26] == 0)
+            clk = ioreg[clks] - 1;
+        else if (ioreg[26] == 1)
+            clk = ioreg[clks] - 2;
         for (int i=0; irq2[i] != -1; i++)
             {
-                // printf("%d %d\n", *pc, *(irq2+i));
-                // printf("%d %d\n", clk, *(irq2+i));
                 if(clk == *(irq2+i)) return(1);
             }
         return(0);
