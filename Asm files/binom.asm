@@ -1,3 +1,5 @@
+add $t2, $zero, $imm, 1          #$t2 = 1
+sll $sp, $t2, $imm, 11           #set $sp = 1 << 11 = 2048
 lw $a0, $imm, $zero, 0x100             #set $a0 to n
 lw $a1, $imm, $zero, 0x101             #set $a1 to k
 add $sp, $imm, $sp, -4                 #allocating memory in the stack
