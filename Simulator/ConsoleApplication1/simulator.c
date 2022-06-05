@@ -230,32 +230,10 @@ void write_diskout(FILE* fp_diskout, char disk_memory[][MAX_DISK_LINE_LEN]) {
 void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MAX_SIZE], int* pc_pointer, int* is_in_task, int irq2[], int monitor[], char disk_memory[][MAX_DISK_LINE_LEN], FILE** file_pointers[], int* disk_cycle_ptr)
 {
     int io_target_reg;
-    int old_pc;
-    int old_imm = inst->imm;
-    int pc_adder = 1; // adding 1 or 2 according to the type of the instruction.
-    if (instructionType(inst) == I_TYPE)
-    {
-        ioreg[26] = 1; //set I type flag to 1
-        old_pc = *pc_pointer;
-        next_clk;
-        if (*pc_pointer != old_pc){ // if the intterupt changed the pc
-            return;
-        }
-        regs[IMM_REG] = inst->imm;
-        pc_adder = 2;
-    }
-    else
-    {
-        ioreg[26] = 0; //set I type flag to 1
-        regs[IMM_REG] = 0;
-        old_imm = 0;
-    }
-    //Write Trace
-    write_trace(*file_pointers[TRACE], *pc_pointer, memory, regs);
+   
     switch (inst->opcode)
     {
     case 0: // add
-        *pc_pointer += pc_adder;
         if (inst->rd <= IMM_REG) // wrting to REG0 or REG IMM
         {
             break; //dont update target register's value
@@ -264,7 +242,6 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
 
         break;
     case 1: // sub
-        *pc_pointer += pc_adder;
         if (inst->rd <= IMM_REG) // wrting to REG0 or REG IMM
         {
             break; //dont update target register's value
@@ -273,7 +250,6 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
 
         break;
     case 2: // mul
-        *pc_pointer += pc_adder;
         if (inst->rd <= IMM_REG) // wrting to REG0 or REG IMM
         {
             break; //dont update target register's value
@@ -281,7 +257,6 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
         regs[inst->rd] = regs[inst->rs] * regs[inst->rt];
         break;
     case 3: // and
-        *pc_pointer += pc_adder;
         if (inst->rd <= IMM_REG) // wrting to REG0 or REG IMM
         {
             break; //dont update target register's value
@@ -290,7 +265,6 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
 
         break;
     case 4: // or
-        *pc_pointer += pc_adder;
         if (inst->rd <= IMM_REG) // wrting to REG0 or REG IMM
         {
             break; //dont update target register's value
@@ -299,7 +273,6 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
 
         break;
     case 5: // xor
-        *pc_pointer += pc_adder;
         if (inst->rd <= IMM_REG) // wrting to REG0 or REG IMM
         {
             break; //dont update target register's value
@@ -307,7 +280,6 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
         regs[inst->rd] = regs[inst->rs] ^ regs[inst->rt];
         break;
     case 6: // sll
-        *pc_pointer += pc_adder;
         if (inst->rd <= IMM_REG) // wrting to REG0 or REG IMM
         {
             break; //dont update target register's value
@@ -316,7 +288,6 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
 
         break;
     case 7: // sra
-        *pc_pointer += pc_adder;
         if (inst->rd <= IMM_REG) // wrting to REG0 or REG IMM
         {
             break; //dont update target register's value
@@ -325,7 +296,6 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
 
         break;
     case 8: // srl
-        *pc_pointer += pc_adder;
         if (inst->rd <= IMM_REG) // wrting to REG0 or REG IMM
         {
             break; //dont update target register's value
@@ -341,62 +311,47 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
     case 9: // beq
         if (regs[inst->rs] == regs[inst->rt])
             *pc_pointer = regs[inst->rd];
-        else
-            *pc_pointer += pc_adder;
         break;
     case 10: // bne
         if (regs[inst->rs] != regs[inst->rt])
             *pc_pointer = regs[inst->rd];
         else
-            *pc_pointer += pc_adder;
         break;
     case 11: // blt
         if (regs[inst->rs] < regs[inst->rt])
             *pc_pointer = regs[inst->rd];
         else
-            *pc_pointer += pc_adder;
         break;
     case 12: // bgt
         if (regs[inst->rs] > regs[inst->rt])
             *pc_pointer = regs[inst->rd];
-        else
-            *pc_pointer += pc_adder;
         break;
     case 13: // ble
         if (regs[inst->rs] <= regs[inst->rt])
             *pc_pointer = regs[inst->rd];
-        else
-            *pc_pointer += pc_adder;
         break;
     case 14: // bge
         if (regs[inst->rs] >= regs[inst->rt])
             *pc_pointer = regs[inst->rd];
-        else
-            *pc_pointer += pc_adder;
         break;
     case 15: // jal
-        *pc_pointer += pc_adder;
         regs[inst->rd] = *pc_pointer;
         *pc_pointer = regs[inst->rs];
         break;
     case 16: // lw
-        *pc_pointer += pc_adder;
         regs[inst->rd] = extend_sign(strtoul(memory[regs[inst->rs] + regs[inst->rt]], NULL, 16));
-        next_clk;
+        //next_clk;
         break;
     case 17: // sw
-        *pc_pointer += pc_adder;
         sprintf(memory[regs[inst->rs] + regs[inst->rt]], "%05X", regs[inst->rd]);
-        next_clk;
+        //next_clk;
         break;
     case 18: // reti
-        *pc_pointer += pc_adder;
         *is_in_task = 0;
         *pc_pointer = ioreg[IRQRETURN_REG];
         break;
     case 19: // in
         io_target_reg = regs[inst->rs] + regs[inst->rt];
-        *pc_pointer += pc_adder;
         if (inst->rd <= IMM_REG) // wrting to REG0 or REG IMM
         {
             break; //dont update target register's value
@@ -406,7 +361,6 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
         break;
     case 20: // out
         io_target_reg = regs[inst->rs] + regs[inst->rt];
-        *pc_pointer += pc_adder;
         ioreg[io_target_reg] = regs[inst->rd];
         hwregtrace_write(*file_pointers[HWREGTRACE], ioreg[CLK_REG], inst->opcode == 20, io_target_reg, regs[inst->rd]);
         break;
@@ -417,8 +371,6 @@ void decode_inst(int* regs, int* ioreg, Instruction* inst, char memory[][LINE_MA
         printf("Unrecognized command, exiting simulation\n");
         *pc_pointer = -1;
     }
-    regs[IMM_REG] = old_imm;
-    regs[ZERO_REG] = 0;
 }
 
 void run_instructions(int regs[NUM_REGS], int* ioreg, FILE** file_pointers[], char memory[][LINE_MAX_SIZE], int* is_in_task, int irq2[], int monitor[], char disk_memory[][MAX_DISK_LINE_LEN], int* disk_cycle_ptr)
@@ -426,16 +378,29 @@ void run_instructions(int regs[NUM_REGS], int* ioreg, FILE** file_pointers[], ch
     FILE* fp_trace = *file_pointers[TRACE];
     int pc = 0;
     int* pc_pointer = &pc;
+    int old_pc = pc;
+    int temp_pc = 0;
     Instruction* current_instruction;
     while (pc != -1)
     {
-        next_clk;
+        
         //fetch instruction from memory
         current_instruction = read_instruction(pc, memory);
-        //instructionPrintInstruction(current_instruction);
+        regs[ZERO_REG] = 0;
+        regs[IMM_REG] = 0;
+        if (instructionType(current_instruction) == I_TYPE) regs[IMM_REG] = current_instruction->imm;
+        //Write Trace
+        write_trace(*file_pointers[TRACE], *pc_pointer, memory, regs);
+        pc++;
+        if (instructionType(current_instruction) == I_TYPE)pc++;
+        ioreg[26] = instructionType(current_instruction) == I_TYPE;
         // execute the next instruction from the assembly
         decode_inst(regs, ioreg, current_instruction, memory, pc_pointer, is_in_task, irq2, monitor, disk_memory, file_pointers, disk_cycle_ptr);
-        //print_reg_state(pc, regs, current_instruction);
+        current_instruction = read_instruction(pc, memory);
+        old_pc = pc;
+        next_clk;
+        if (instructionType(current_instruction) == I_TYPE) next_clk;
+        if ((current_instruction->opcode == 16) || (current_instruction->opcode == 17)) next_clk; //if it is sw or lw
 
     }
 
