@@ -60,6 +60,7 @@ void monitor(int monitor_arr[], int ioreg[]) // print to monitor
     }
 void disk_command(int ioreg[], char disk_memory[][MAX_DISK_LINE], int *disk_cycle, char memory[LINES_MAX][LINES_MAX_SIZE]) // write to or read from disk
     {
+        printf("diskcmd = %d, diskstatus = %d, cycle = %d, disksector = %d, clk = %d\n",ioreg[diskcmd], ioreg[diskstatus], *disk_cycle, ioreg[disksector], ioreg[clks]);
         int is_full = 0;
         if ((ioreg[diskcmd] != 0) && (*disk_cycle == 0)) // if there is a disk cmd and the disk is available
             {
@@ -73,9 +74,12 @@ void disk_command(int ioreg[], char disk_memory[][MAX_DISK_LINE], int *disk_cycl
                             }
                         else if (ioreg[diskcmd] == 2) // write sector
                             {
-                                for (int i=0; i<128; i++) strcpy(disk_memory[ioreg[disksector]*SECTOR_SIZE+i], memory[ioreg[diskbuffer]+i]); // write to disk
+                                for (int i=0; i<128; i++) 
+                                {
+                                    printf("sector: %d %d, buffer: %d\n", ioreg[disksector], ioreg[disksector] * SECTOR_SIZE + i, ioreg[diskbuffer]);
+                                    strcpy(disk_memory[ioreg[disksector]*SECTOR_SIZE+i], memory[ioreg[diskbuffer]+i]); // write to disk
+                                }
                             }
-                        printf("mem = %d, disk = %d", memory[ioreg[diskbuffer]], disk_memory[ioreg[disksector]*SECTOR_SIZE]);
                     }
             }
         else if (*disk_cycle > 1) 
@@ -95,7 +99,7 @@ void led_write(int ioreg[], int *led, FILE *leds_file, int *pc)
         if (ioreg[leds] != ioreg[23])
             {
                 ioreg[23] = ioreg[leds];
-                fprintf(leds_file, "%d %08X\n", *pc, ioreg[23]); // write to leds
+                fprintf(leds_file, "%d %08X\n", ioreg[clks], ioreg[23]); // write to leds
             }
     }
 void hwregtrace_write(FILE *fp, int cycle, int read_write, int reg_num, int data) // write hwregtrace file
@@ -183,8 +187,7 @@ void display7seg_write(FILE *display7seg_file, int ioreg[], int *pc) // write to
     {
         if (ioreg[display7seg] != ioreg[24])
             {
-                // printf("%d %X\n", ioreg[display7seg], ioreg[display7seg]);
-                fprintf(display7seg_file, "%d %08X\n", *pc, ioreg[display7seg]); // print to file
+                fprintf(display7seg_file, "%d %08X\n", ioreg[clks], ioreg[display7seg]); // print to file
                 ioreg[24] = ioreg[display7seg];
             }
     }

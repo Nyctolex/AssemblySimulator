@@ -310,15 +310,9 @@ int main(int arg_amount, char *arg_vals[])
     }
 /*
     fixes:
-        remove zeros?
-        add comments
-        add header file
         ! this:
             add $t0, $imm, $imm, 3
             add $imm, $zero, $imm, 3
             .word 5 0x2
             ! is printing 2E at line 6
-        ? should .word overwrite the n or n+1 line ?
-        ? is a commented line counted for labels ?
-        ? can hex data be with "-" ?
 */

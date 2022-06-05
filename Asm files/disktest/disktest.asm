@@ -1,62 +1,41 @@
-add $t0, $zero, $zero, 0                    # i = 0
-add $t1, $zero, $zero, 0                    # j = 0
-add $a2, $zero, $zero, 0                    # a2 = 0
-IndexLoop:
-    # if (i == 128) goto IndexEnd
-    add $t2, $zero, $imm, 128               # t2 = 128
-    add $t3, $zero, $imm, IndexEnd
-    beq $t3, $t0, $t2, 0                    # if (i == 128) goto IndexEnd
-    # a0 = disk[0][i]
-    out $zero, $zero, $imm, 15              # disksector = 0
-    out $t0, $zero, $imm, 16                # diskbuffer = i
-    add $t3, $zero, $imm, 1
-    out $t3, $zero, $imm, 14                # diskcmd = read
-    lw $a0, $zero, $t0, 0                # a0 = disk[0][i]
-    add $a2, $a2, $a0, 0
-    # a1 = disk[1][i]
-    out $zero, $zero, $imm, 15              # disksector = 0
-    out $t0, $zero, $imm, 16                # diskbuffer = i
-    add $t3, $zero, $imm, 1
-    out $t3, $zero, $imm, 14                # diskcmd = read
-    add $t3, $t0, $imm, 128
-    lw $a1, $zero, $t3, 0                # a1 = disk[1][i]
-    SectorLoop:
-        # if (j == 8) goto SectorEnd
-        add $t2, $zero, $imm, 8             # t2 = 8
-        add $t3, $zero, $imm, SectorEnd
-        beq $t3, $t1, $t2, 0                # if (j == 8) goto SectorEnd
-        # a2 = a0 + a1
-        add $a2, $a2, $a1, 0
-        # a0 = disk[j][i]
-        out $t1, $zero, $imm, 15              # disksector = j
-        out $t0, $zero, $imm, 16                # diskbuffer = i
-        add $t3, $zero, $imm, 1
-        out $t3, $zero, $imm, 14                # diskcmd = read
-        # find space in mem
-        add $t3, $zero, $t1, 0
-        mul $t3, $t3, $imm, 128
-        add $t3, $t3, $t0, $0
-
-        lw $a0, $zero, $t3, 0                    # a0 = disk[j][i]
-        # a2 = a2 + a0
-        add $a2, $a2, $a0, 0
-        # j++
-        add $t1, $t1, $imm, 1
-        beq $imm, $zero, $zero, SectorLoop
-SectorEnd:
-    # disk[8][i] = a2
-    out $t1, $zero, $imm, 15              # disksector = j
-    out $t0, $zero, $imm, 16                # diskbuffer = i
-    # find space in mem
-    add $t3, $zero, $t1, 0
-    mul $t3, $t3, $imm, 128
-    add $t3, $t3, $t0, $0
-    sw $a2, $t3, $zero, 0
-    # write to disk
-    add $t3, $zero, $imm, 2
-    out $t3, $zero, $imm, 14                # diskcmd = write
-    # i++
-    add $t0, $t0, $imm, 1
-    beq $imm, $zero, $zero, IndexLoop
-IndexEnd:
-Halt $zero, $zero, $zero, 0
+add $t0, $zero, $zero, 0
+add $a1, $zero, $zero, 0
+LoopStart:
+    # check if disk is busy
+    add $t1, $zero, $imm, LoopStart
+    in $t2, $zero, $imm, 17
+    bne $t1, $zero, $t2, 0
+    # if (i==8) goto LoopEnd
+    add $t1, $zero, $imm, LoopEnd
+    add $t2, $zero, $imm, 8
+    beq $t1, $t0, $t2, 0
+    # init disk
+    out $t0, $zero, $imm, 15                    # disksector = i
+    add $s1, $t0, $imm, 1000
+    out $s1, $zero, $imm, 16                    # diskbuffer = i
+    add $t1, $zero, $imm, 1
+    out $t1, $zero, $imm, 14                    # diskcmd = read
+    # read from mem and sum
+    # ! read all 128 sectors
+    lw $a0, $zero, $t1, 0
+    add $a1, $a1, $a0, 0
+    add $t0, $t0, $imm, 1                       # i++
+    # return to LoopStart
+    add $t1, $zero, $imm, LoopStart
+    beq $t1, $zero, $zero, 0
+LoopEnd:
+    # check if disk is busy
+    add $t1, $zero, $imm, LoopEnd
+    in $t2, $zero, $imm, 17
+    bne $t1, $zero, $t2, 0
+    # write to sec[8]
+        # init disk
+        add $t1, $zero, $imm, 8 # !!!!!!!!!!!!!!!!!!!!!!
+        out $t1, $zero, $imm, 15                # disksector = 8
+        # add $s1, $t0, $imm, 1000
+        add $s1, $t0, $imm, 2000
+        out $s1, $zero, $imm, 16                # diskbuffer = i
+        add $t1, $zero, $imm, 2
+        out $t1, $zero, $imm, 14                # diskcmd = write
+        # ! wait for end
+        halt $zero, $zero, $zero, 0
