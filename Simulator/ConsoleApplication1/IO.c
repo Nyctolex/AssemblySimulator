@@ -61,7 +61,6 @@ void monitor(int monitor_arr[], int ioreg[]) // print to monitor
 void disk_command(int ioreg[], char disk_memory[][MAX_DISK_LINE], int *disk_cycle, char memory[LINES_MAX][LINES_MAX_SIZE]) // write to or read from disk
     {
         int is_full = 0;
-        int line_index = -1;
         if ((ioreg[diskcmd] != 0) && (*disk_cycle == 0)) // if there is a disk cmd and the disk is available
             {
                 if (ioreg[diskstatus] == 0) // if disk is not busy
@@ -70,34 +69,13 @@ void disk_command(int ioreg[], char disk_memory[][MAX_DISK_LINE], int *disk_cycl
                         ioreg[diskstatus] = 1;
                         if (ioreg[diskcmd] == 1) // read sector
                             {
-                                // for (int i=1000; i<LINES_MAX; i++) // for every memory line greater than 1000
-                                //     {
-                                //         is_full = 0;
-                                //         for (int j=0; j<LINES_MAX_SIZE; j++) // for every element in memory line
-                                //             {
-                                //                 if (memory[i][j] != 0) // check if an element is occupied
-                                //                     {
-                                //                         is_full = 1;
-                                //                         break;
-                                //                     }
-                                //             }
-                                //         if (is_full == 1) continue;
-                                //         else
-                                //             {
-                                //                 line_index = i;
-                                //                 break;
-                                //             }
-                                //     }
-                                // ! is needed?
-                                line_index = ioreg[disksector]*SECTOR_SIZE+ioreg[diskbuffer];
-                                // printf("%d", line_index);
-                                strcpy(memory[line_index], disk_memory[ioreg[disksector]*SECTOR_SIZE+ioreg[diskbuffer]]); // read from disk
+                                for (int i=0; i<128; i++) strcpy(memory[ioreg[diskbuffer]+i], disk_memory[ioreg[disksector]*SECTOR_SIZE+i]); // read from disk
                             }
                         else if (ioreg[diskcmd] == 2) // write sector
                             {
-                                line_index = ioreg[disksector]*SECTOR_SIZE+ioreg[diskbuffer]; // ! is true?
-                                strcpy(disk_memory[ioreg[disksector]*SECTOR_SIZE+ioreg[diskbuffer]], memory[line_index]); // write to disk
+                                for (int i=0; i<128; i++) strcpy(disk_memory[ioreg[disksector]*SECTOR_SIZE+i], memory[ioreg[diskbuffer]+i]); // write to disk
                             }
+                        printf("mem = %d, disk = %d", memory[ioreg[diskbuffer]], disk_memory[ioreg[disksector]*SECTOR_SIZE]);
                     }
             }
         else if (*disk_cycle > 1) 
