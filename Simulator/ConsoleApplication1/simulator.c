@@ -393,9 +393,13 @@ void run_instructions(int regs[NUM_REGS], int* ioreg, FILE** file_pointers[], ch
         write_trace(*file_pointers[TRACE], *pc_pointer, memory, regs);
         pc++;
         if (instructionType(current_instruction) == I_TYPE)pc++;
-        if ((current_instruction->opcode == 16) || (current_instruction->opcode == 17)) next_clk; //if it is sw or lw
-        // execute the next instruction from the assembly
         decode_inst(regs, ioreg, current_instruction, memory, pc_pointer, is_in_task, irq2, monitor, disk_memory, file_pointers, disk_cycle_ptr);
+        next_clk;
+        if (instructionType(current_instruction) == I_TYPE) next_clk;
+         if ((current_instruction->opcode == 16) || (current_instruction->opcode == 17)) next_clk; //if it is sw or lw
+       
+        
+        
        
 
     }
