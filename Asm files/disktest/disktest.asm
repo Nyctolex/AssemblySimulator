@@ -33,8 +33,8 @@ LoopEnd:
         add $t1, $zero, $imm, 8 # !!!!!!!!!!!!!!!!!!!!!!
         out $t1, $zero, $imm, 15                # disksector = 8
         # add $s1, $t0, $imm, 1000
-        add $s1, $t0, $imm, 2000
-        out $s1, $zero, $imm, 16                # diskbuffer = i
+        add $t1, $zero, $imm, 2000
+        out $t1, $zero, $imm, 16                # diskbuffer = i
         add $t1, $zero, $imm, 2
         out $t1, $zero, $imm, 14                # diskcmd = write
         # ! wait for end
