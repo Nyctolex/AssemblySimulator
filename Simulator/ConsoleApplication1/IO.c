@@ -60,7 +60,6 @@ void monitor(int monitor_arr[], int ioreg[]) // print to monitor
     }
 void disk_command(int ioreg[], char disk_memory[][MAX_DISK_LINE], int *disk_cycle, char memory[LINES_MAX][LINES_MAX_SIZE]) // write to or read from disk
     {
-        printf("diskcmd = %d, diskstatus = %d, cycle = %d, disksector = %d, clk = %d\n",ioreg[diskcmd], ioreg[diskstatus], *disk_cycle, ioreg[disksector], ioreg[clks]);
         int is_full = 0;
         if ((ioreg[diskcmd] != 0) && (*disk_cycle == 0)) // if there is a disk cmd and the disk is available
             {
@@ -76,7 +75,6 @@ void disk_command(int ioreg[], char disk_memory[][MAX_DISK_LINE], int *disk_cycl
                             {
                                 for (int i=0; i<128; i++) 
                                 {
-                                    printf("sector: %d %d, buffer: %d\n", ioreg[disksector], ioreg[disksector] * SECTOR_SIZE + i, ioreg[diskbuffer]);
                                     strcpy(disk_memory[ioreg[disksector]*SECTOR_SIZE+i], memory[ioreg[diskbuffer]+i]); // write to disk
                                 }
                             }

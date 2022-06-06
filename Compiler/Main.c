@@ -32,9 +32,9 @@ int is_imm(char *line) // checks if the line has an imm (not in the 1st reg)
                 if (line[i] == 'b' && line[i+1] == 'g' && line[i+2] == 'e') jump=1; // if the op is bge
                 if (line[i] == 's' && line[i+1] == 'w') jump=1; // if the op is sw
                 if (line[i] == 'o' && line[i+1] == 'u' && line[i+2] == 't') jump=1; // if the op is out
-                if (line[i] == 'i' && line[i+1] == 'm' && line[i+2] == 'm' && counter != 1) return TRUE;
-                if (line[i] == 'i' && line[i+1] == 'm' && line[i+2] == 'm' && counter == 1 && jump == 1) return TRUE;
-                if (line[i] == 'i' && line[i+1] == 'm' && line[i+2] == 'm' && counter == 1) return FALSE;
+                if (line[i] == 'i' && line[i+1] == 'm' && line[i+2] == 'm' && counter != 2) return TRUE;
+                 if (line[i] == 'i' && line[i+1] == 'm' && line[i+2] == 'm' && counter == 2 && jump == 1) return TRUE;
+                // if (line[i] == 'i' && line[i+1] == 'm' && line[i+2] == 'm' && counter == 1) return FALSE;
             }
         return FALSE;
     }
@@ -237,6 +237,7 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list,
                                         else // translate reg
                                             {
                                                 if ((hex == 1) && (counter == 1)) not_imm = 1;
+                                                if ((hex == 1) && (counter != 1)) not_imm = 0;
                                                 sprintf(temp_char, "%01X", hex);
                                                 add_to_memin_str(temp_char, memin_str, 1, counter);
                                             }
