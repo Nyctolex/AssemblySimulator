@@ -177,14 +177,6 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list,
                         break;
                     }
             }
-        for (int i = 0; i < strlen(line); i++) // check if line is empty
-            {
-                if (!(line[i] == ' '))
-                    {
-                        if (line[i] != '\n') break;
-                        else return;
-                    }
-            }
         for (int i = 0; i < strlen(line); i++)
             {
                 if (line[i] == ':') return; // skip label line
@@ -270,9 +262,27 @@ void iter_lines(FILE *fp, char iter_type, Label *label_list, FILE *memin, char *
         char line [MAX_LINE_SIZE];
         int line_index = 0;
         int line_loc = 0;
+        int is_empty = 0;
         while (fgets(line, MAX_LINE_SIZE, asm_file))
             {
-                if (line[0] == '\n') continue;
+                for (int i = 0; i < strlen(line); i++) // check if line is empty
+                {
+
+                    if (!(line[i] == ' '))
+                    {
+                        if (line[i] != '\n' && line[i] != '#') break;
+                        else
+                            {
+                                is_empty = 1;
+                                break;
+                            }
+                    }
+                }
+                if (is_empty == 1)
+                    { 
+                    is_empty = 0;
+                    continue;
+                    }
                 if (iter_type == GET_LABEL) line_loc = search_label(line, line_index, line_loc, label_list); // iterate and find all labels
                 else if (iter_type == TRANSLATE_ITER) translate_file(line, line_index, line_loc, label_list, memin, memin_str); // iterate and translate to hex
                 line_index++;
