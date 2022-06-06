@@ -111,7 +111,7 @@ void add_word(char *line, char *memin_str) // add .word data to memin
                         if (line[i] == '0' && (line[i+1] == 'x' || line[i+1] == 'X')) // if the number is hex
                             hex = 1;
                         temp_var[j] = line[i]; // save the var's chars in string
-                        if (isspace(line[i+1])) // when the number ends
+                        if (isspace(line[i+1]) || (line[i+1] == '\0')) // when the number ends
                             {
                                 if (counter == 0) // line place
                                     {
@@ -150,7 +150,7 @@ void add_word(char *line, char *memin_str) // add .word data to memin
                             }
                         j++;
                     }
-                if ((line[i] == '#') || (line[i] == '\n')) break;
+                if ((line[i] == '#') || (line[i] == '\n') || (line[i] == '\0')) break;
                 if (isspace(line[i])) continue;
             }
         int memin_loc_temp = memin_loc;
