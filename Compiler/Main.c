@@ -207,7 +207,7 @@ void translate_file(char *line, int line_index, int line_loc, Label *label_list,
                                 add_to_memin_str(temp_str, memin_str, 5, 0);
                                 return;
                             }
-                        else if ((isdigit(var[0]) || (var[0] == '-')) && atoi(var) != 0 && not_imm == 0) // translate dec imm num
+                         else if ((isdigit(var[0]) || (var[0] == '-')) && atoi(var) != 0 && not_imm == 0) // translate dec imm num
                             {
                                 sprintf(temp_str, "%05X", atoi(var)&0x000FFFFF);
                                 add_to_memin_str(temp_str, memin_str, 5, 0);
@@ -319,11 +319,3 @@ int main(int arg_amount, char *arg_vals[])
             }
         return 0;
     }
-/*
-    fixes:
-        ! this:
-            add $t0, $imm, $imm, 3
-            add $imm, $zero, $imm, 3
-            .word 5 0x2
-            ! is printing 2E at line 6
-*/
